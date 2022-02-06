@@ -8,7 +8,7 @@ class Span:
         self.q_min = q_min
 
 class Beam: 
-    def __init__(self, spans: list = [] , supports: str = "incastre"):
+    def __init__(self, spans: list[object] , supports: str = "incastre"):
         self.spans = spans
         self.supports = supports # suddividere in  left and right
     
@@ -18,11 +18,11 @@ class Beam:
 
     def spans_total_lenght(self) -> float:
         """Return the sum of spans lenght"""
-        return np.sum(self.spans_lenght, dtype=float) 
+        return np.sum(self.spans_lenght(), dtype=float)
     
     def spans_cum_lenght(self) -> list:
         """Return the cumulative sum of spans lenghts"""
-        return np.cumsum(self.spans_lenght, dtype=float)
+        return np.cumsum(self.spans_lenght(), dtype=float)
 
     def spans_ej(self) -> list:
         """Return a list with spans' ej"""
