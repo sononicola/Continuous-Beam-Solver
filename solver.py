@@ -11,7 +11,32 @@ class Beam:
     def __init__(self, spans: list[object] , supports: str = "incastre"):
         self.spans = spans
         self.supports = supports # suddividere in  left and right
+
+    def get_spans(self): # boh non serve credo
+        return self.spans
+
+    def add_span(self, new_span: object):
+        """Add a single Span object to the spans list. 
+        Don't add a list of object like add_span([x1,x2]), but use add_list_of_spans([x1,x2]) instead!
+        
+        x1 = Span(...) \n
+        beam = Beam([]) \n
+        beam.add_span(x1)
+        """
+        self.spans.append(new_span)
     
+    def add_list_of_spans(self, list_of_spans: list[object]):
+        """
+        Add a list of object Span to the spans list. 
+        To add a single Span object use add_span(x1) insted!
+        
+        x1 = Span(...) \n
+        x2 = Span(...) \n
+        beam = Beam([]) \n
+        beam.add_span([x1,x2])
+        """
+        self.spans.extend(list_of_spans)
+
     def spans_lenght(self) -> list:
         """Return a list with spans' lenghts"""
         return [span.lenght for span in self.spans]
