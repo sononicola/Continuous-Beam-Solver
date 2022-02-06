@@ -1,4 +1,5 @@
 import numpy as np
+import sympy as sp
 
 class Span:
     def __init__(self, lenght: float, ej: float, q_max: float = 0., q_min: float = 0.):
@@ -7,12 +8,15 @@ class Span:
         self.q_max = q_max
         self.q_min = q_min
 
+    def set_lenght(self):  # boh non servirà credo
+        pass
+
 class Beam: 
     def __init__(self, spans: list[object] , supports: str = "incastre"):
         self.spans = spans
         self.supports = supports # suddividere in  left and right
 
-    def get_spans(self): # boh non serve credo
+    def get_spans(self): # boh non servirà credo
         return self.spans
 
     def add_span(self, new_span: object):
@@ -61,20 +65,41 @@ class Beam:
         """Return a list with spans' q_min"""
         return [span.q_min for span in self.spans]
 
+    # --- REAL SOLVING METHODS: ---
+    # Using sympy:  symbolic -> reduced with BC -> subsituted with numeric values ->  solved the system ->  expanded to initial lenghts row, columns
 
-x1 = Span(1,2)
-x2 = Span(5,6)
-x3 = Span(1.5, 7.6)
-beam = Beam([x1,x2,x3])
+    def symbolic_matrix_lenghts():
+        pass
 
-for span in beam.spans: 
-    print(span.ej)
+    def symbolic_matrix_Q():
+        pass
 
-print(beam.spans_lenght())
-print(beam.spans_ej())
-print(beam.spans_q_max())
-print(beam.spans_q_min())
+    def symbolic_matrix_P():
+        pass
 
-beam.spans_total_lenght
+    def symbolic_matrix_EJ():
+        pass
 
+    # --- PRINTING/PLOTTING AND STORING VALUES ---
+    def plot_M_unitario(): # nomi migliori per tuti
+        pass
+   
+    def plot_V_unitario():
+        pass
 
+    def plot_M_totale():
+        pass
+   
+    def plot_V_totale():
+        pass
+
+    def tabella():
+        pass
+
+    def latex_passaggi_intermedi():
+        pass
+
+    # ---
+    # Linee orizzontali al momento aggiungendo un parametro a Beam con il valore di M
+
+    # Disegno tikz
