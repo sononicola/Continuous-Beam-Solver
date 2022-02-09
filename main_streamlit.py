@@ -1,6 +1,8 @@
 import streamlit as st
-from solver import Span, Beam
 import numpy as np
+import sympy as sp
+from solver import Span, Beam
+
 
 # -- INIT --
 beam = Beam([]) # every time some widget is clicked, streamlit re-start everything from here 
@@ -93,4 +95,3 @@ st.radio("s",["c","a"])
 st.sidebar.write("prova")
 st.sidebar.button("asa")
 
-st.latex(**r"\alpha", **"s")
