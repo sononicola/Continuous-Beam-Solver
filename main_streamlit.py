@@ -1,6 +1,6 @@
 import streamlit as st
-import numpy as np
-import sympy as sp
+#import numpy as np
+#import sympy as sp
 from solver import Span, Beam
 
 

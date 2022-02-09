@@ -1,5 +1,5 @@
 import numpy as np
-import sympy as sp
+#import sympy as sp
 
 class Span:
     def __init__(self, lenght: float, ej: float, q_max: float = 0., q_min: float = 0.):
