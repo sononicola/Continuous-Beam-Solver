@@ -1,5 +1,2 @@
-This is a better version of this old project:
-https://github.com/sononicola/Sicurezza_Strutturale/blob/master/Risolutore%20Trave.ipynb
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://share.streamlit.io/sononicola/continuous-beam-solver/main/main_streamlit.py)
 
-work in progress
- 
