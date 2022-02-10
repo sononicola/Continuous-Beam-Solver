@@ -272,3 +272,4 @@ TSWLatexianTemp*
 # Makeindex log files
 *.lpz
 .ipynb_checkpoints/
+__pycache__/solver.cpython-39.pyc

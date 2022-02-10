@@ -1,7 +1,8 @@
 import streamlit as st
-#import numpy as np
-#import sympy as sp
-from code.solver import Span, Beam, Solver
+import numpy as np
+import sympy as sp
+import matplotlib.pyplot as plt
+from solver import Span, Beam, Compute
 
 
 # -- INIT --
@@ -87,11 +88,6 @@ st.write(f"{beam.spans_q_max() = }")
 st.write(f"{beam.spans_q_min() = }")
 
 
-a = 12.14785
-st.write(f"{a = :.2f}")
+run = Compute(beam)
 
-st.slider("prova colore")
-st.radio("s",["c","a"])
-st.sidebar.write("prova")
-st.sidebar.button("asa")
-
+st.latex(sp.latex(run.generate_Flex_matrix()))
