@@ -1,7 +1,7 @@
 import streamlit as st
 #import numpy as np
 #import sympy as sp
-from solver import Span, Beam
+from code.solver import Span, Beam, Solver
 
 
 # -- INIT --
