@@ -78,7 +78,10 @@ with c2:
 spans = [Span(lenghts[i], ejs[i]) for i in range(nSpan)]
 
 # Add the spans list to the Beam object
-beam.add_list_of_spans(spans)
+# beam.add_list_of_spans(spans)
+
+# Solo per test dato che gli if sono ancora da sistemare :
+beam  = Beam(spans, supports='incastre-right')  #TODO da capire se meglio all'inizio eaggiunto o subito qui
 
 st.write(f"{beam.spans_lenght() = }")
 st.write(f"{beam.spans_total_lenght() = }")
@@ -90,4 +93,12 @@ st.write(f"{beam.spans_q_min() = }")
 
 run = Compute(beam)
 
+st.write(f"{run.generate_Flex_matrix() = }")
+st.write(f"{run.generate_expanded_x_solutions() = }")
+st.write(f"{run.generate_R_solutions() = }")
+
 st.latex(sp.latex(run.generate_Flex_matrix()))
+st.latex(sp.latex(run.generate_expanded_x_solutions()))
+st.latex(sp.latex(run.generate_R_solutions()))
+
+st.pyplot(run.plot_bending_moment_beam_Q())

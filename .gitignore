@@ -273,3 +273,4 @@ TSWLatexianTemp*
 *.lpz
 .ipynb_checkpoints/
 __pycache__/solver.cpython-39.pyc
+*.pyc

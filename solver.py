@@ -51,8 +51,10 @@ class Beam:
         return np.sum(self.spans_lenght(), dtype=float)
     
     def spans_cum_lenght(self) -> list:
-        """Return the cumulative sum of spans lenghts"""
-        return np.cumsum(self.spans_lenght(), dtype=float)
+        """Return the cumulative sum of spans where the first element is 0"""
+        cum_sum  = np.cumsum(self.spans_lenght(), dtype=float)
+        cum_sum = np.insert(cum_sum,0,0.0) # Add a 0 at the beginning
+        return cum_sum
 
     def spans_ej(self) -> list:
         """Return a list with spans' ej"""
@@ -213,7 +215,7 @@ class Compute:
                 .subs( zip(Q,np.identity(nCampate)[n_span]))
 
             # solve the system: # --- maybe there is a more efificient way 
-            x = flex_sub.inv() * P_sub
+            x = - flex_sub.inv() * P_sub
 
             list_of_reduced_x_solution_vectors.append(x)
         return list_of_reduced_x_solution_vectors
@@ -252,32 +254,65 @@ class Compute:
         for n_span in range(nCampate):
             mat1 = sp.Matrix([  (x[n_span][i+1] - x[n_span][i])/lenghts[i] for i in range(0,nCampate)  ])
             mat2 = sp.Matrix(lenghts[n_span]/2 * np.identity(nCampate)[n_span])
-            list_of_R.append(mat1 - mat2)
+            list_of_R.append(mat1 + mat2)
         return list_of_R
-
-    def momento(self):
+          
+    def bending_moment_span_Q(self, span_Q : int):
+        """
+        span_Q is the span where the distribuited load Q is applied
+        """
+        # TODO togliere i commentati
         nCampate =  self.nCampate
         #lenghts = self.beam.spans_lenght() 
         cum_lenghts = self.beam.spans_cum_lenght()
         total_lenght = self.beam.spans_total_lenght()
+
         x = self.generate_expanded_x_solutions() # List of matrixes
         r = self.generate_R_solutions() # List of matrixes
-        s = np.linspace(0, total_lenght, 100)
-        #s = sp.Symbol('s')
-        #list_of_M = []
-        #for n_span in range(nCampate):
-            
-               #list_of_M.append(m_i)
-        #return list_of_M
+     
         I = np.identity(nCampate)
-        i = 1 # campata vera
-        n_span = 0
+        #span_i = 1 # campata vera
+        #n_span = 0
+    # ---- With Sympy:
+        s = sp.Symbol('s')
+        m_i = [
+                    ((x[span_Q][n_span] + r[span_Q][n_span] * (s-cum_lenghts[n_span])) - ((I[span_Q,n_span]*(s-cum_lenghts[span_Q])**2)/2)) \
+                    * (sp.Heaviside(s-cum_lenghts[n_span]) - sp.Heaviside(s-cum_lenghts[n_span+1])) \
+                for n_span in range(nCampate)
+            ]
+        m_i_lambdify = sp.lambdify(s,-np.sum(m_i,axis=0))
+        s_lambdify  = np.linspace(0, total_lenght, 1000)
+    # ---- With numpy: TODO maybe. doesnt work as expected the heaviside func
+        #s = np.linspace(0, total_lenght, 1000)
+        #m_i = [
+        #           ((x[span_Q][n_span] + r[span_Q][n_span] * (s-cum_lenghts[n_span])) - ((I[span_Q,n_span]*(s-cum_lenghts[span_Q])**2)/2)) \
+        #            * (np.heaviside(s-cum_lenghts[n_span],0) - np.heaviside(s-cum_lenghts[n_span+1],0)) \
+        #        for n_span in range(nCampate)
+        #    ]
         
-        #m_i = [((x[i][n_span] + r[i][n_span] * (s-cum_lenghts[n_span])) - (I[i-1,n_span]*(s-cum_lenghts[i-1])**2)/2) * (sp.Heaviside(s-cum_lenghts[n_span]) - sp.Heaviside(s-cum_lenghts[n_span+1])) for n_span in range(0,5)]
-        m_i = [((x[i][n_span] + r[i][n_span] * (s-cum_lenghts[n_span])) - (I[i-1,n_span]*(s-cum_lenghts[i-1])**2)/2) * (np.heaviside(s-cum_lenghts[n_span],0) - np.heaviside(s-cum_lenghts[n_span+1],0)) for n_span in range(5)]
-        return m_i
+        # m_i is a list of list. We want to sum each list inside, not the total of everything: so we need "axis=0"
+        # Example from numpy documentation: np.sum([[0, 1], [0, 5]], axis=0) >>> array([0, 6])
+        #return np.sum(m_i,axis=0) 
 
+        return m_i_lambdify
 
+    def bending_moment_beam_Q(self): #TODO  
+        nCampate =  self.nCampate
+        return [self.bending_moment_span_Q(span_Q) for span_Q in range(nCampate)]
+
+    def plot_bending_moment_beam_Q(self):
+        nCampate =  self.nCampate 
+        total_lenght = self.beam.spans_total_lenght()
+
+        s_func = np.arange(0, total_lenght, .001)
+        m_tot_un = np.sum([self.bending_moment_span_Q(span_Q = span)(s_func) for span in range(nCampate)], axis=0)
+
+        fig = plt.figure(figsize = (10, 5))
+        plt.plot(s_func,m_tot_un)
+        plt.axhline(0, color='black')
+        plt.show()
+        
+        return fig
 J = (0.3 * 0.5**3)/12 # m4
 EJ =  31476*1000000*J/1000 # Mpa * m4 -> N*m2 -> kN*m2
 
@@ -291,7 +326,24 @@ c_6 = Span(lenght = 4.00, ej = EJ)
 trave = Beam(spans = [c_1, c_2, c_3, c_4, c_5, c_6], supports='incastre-right')
 
 run = Compute(trave)
+print(f"{trave.spans_lenght() = }")
+print(f"{trave.spans_total_lenght() = }")
+print(f"{trave.spans_cum_lenght() = }")
+print(f"{trave.spans_ej() = }")
+print(f"{trave.spans_q_max() = }")
+print(f"{trave.spans_q_min() = }")
 
-plt.plot(run.momento())
-plt.xlim(0,26.6)
-plt.show()
+print("x",run.generate_expanded_x_solutions())
+print("R",run.generate_R_solutions())
+
+#print(run.bending_moment_span_Q(0))
+#plt.plot(run.bending_moment_span_Q(0))
+
+#s_func = np.arange(0, 26.5, .001)
+#for i in range(6):
+ #   m = run.bending_moment_span_Q(span_Q=i)(s_func)
+ #   plt.plot(s_func,m)
+ #   plt.show()
+ #   plt.close()
+
+run.plot_bending_moment_beam_Q()
