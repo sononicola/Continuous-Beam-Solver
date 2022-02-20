@@ -298,6 +298,7 @@ class BendingMoment:
         self.nCampate =  len(beam.spans)
         self.x = x
         self.r = r
+        self.s_func = np.arange(0, beam.spans_total_lenght(), .001) # points on X axe
 
     def bending_moment_span_Q_1(self, span_Q : int): #TODO _1 _func
         """
@@ -341,34 +342,31 @@ class BendingMoment:
 
     def bending_moment_beam_Q_1(self) -> list: #TODO  _1 _func + dividere 
         """"
-        Return X,Y values of bending moment with unitary Q load for the entire beam. It takes the values from bending_moment_span_Q
+        Return Y values of bending moment with unitary Q load for the entire beam. It takes the values from bending_moment_span_Q
         """
         nCampate =  self.nCampate
         total_lenght = self.beam.spans_total_lenght()
 
-        s_func = np.arange(0, total_lenght, .001)
         # substituting s_func points into the lambdify function -> list of Y points
-        m_tot_1 = np.sum([self.bending_moment_span_Q_1(span_Q = span)(s_func) for span in range(nCampate)], axis=0)
-        return s_func, m_tot_1 #TODO m_beam_Q_1
+        m_tot_1 = np.sum([self.bending_moment_span_Q_1(span_Q = span)(self.s_func) for span in range(nCampate)], axis=0)
+        return m_tot_1 #TODO m_beam_Q_1
     
     #def inviluppo_plot()
 
     def bending_moment_beam_Q_real_values(self, combination):
         """
-        Return X,Y values of bending moment with the valuesof Q load substituted for each span
+        Return Y values of bending moment with the valuesof Q load substituted for each span
         """
         nCampate =  self.nCampate
         total_lenght = self.beam.spans_total_lenght()
-        s_func = np.arange(0, total_lenght, .001)
         #Q_list = self.combinations()[1]
-        m_tot_Q_values = np.sum([combination[span] * self.bending_moment_span_Q_1(span_Q = span)(s_func) for span in range(nCampate)], axis=0)
+        m_tot_Q_values = np.sum([combination[span] * self.bending_moment_span_Q_1(span_Q = span)(self.s_func) for span in range(nCampate)], axis=0)
 
-        return s_func, m_tot_Q_values
+        return m_tot_Q_values
 
     def inviluppo(self): #TODO nome inviluppo
         """For each combination substitute the real values of Q and then create the y+ and y- of the inviluppo"""
-        total_lenght = self.beam.spans_total_lenght()
-        #s = np.arange(0, total_lenght, .001)
+        #total_lenght = self.beam.spans_total_lenght()
 
         combinations = self.beam.combinations()
         inviluppo_pos = np.max([self.bending_moment_beam_Q_real_values(combinations[comb]) for comb in range(len(combinations))], axis=0)
@@ -376,7 +374,7 @@ class BendingMoment:
 
         return inviluppo_pos, inviluppo_neg
 
-    def plot_bending_moment_beam_Q(self,  list_of_xy_points): #TODO trasformarlo in un plot generico e metterlo in una sua classe
+    def plot_bending_moment_beam_Q(self, list_of_xy_points): #TODO trasformarlo in un plot generico e metterlo in una sua classe
 
         #nCampate =  self.nCampate 
         #total_lenght = self.beam.spans_total_lenght()
@@ -403,10 +401,51 @@ class BendingMoment:
         ax.set_xlabel(r"$L$")
         ax.set_ylabel(r"$M$") #TODO aggiungere l'if se si usa per il taglio
         
-        
-        
         plt.show()
         return fig #,ax
+
+    def my_plot_style(self, list_of_y_points: list[list] or list):
+        """This is just a style definitions for plot methods. 
+        list_of_y_points is an array of y points or a list of arrays of y points
+        """
+        cum_lenghts = self.beam.spans_cum_lenght()
+
+        fig, ax = plt.subplots(1,1, figsize = (10, 5))
+        ax.invert_yaxis()
+        ax.set_xlim(cum_lenghts[0], cum_lenghts[-1])
+        ax.set_ylim(np.max(list_of_y_points), np.min(list_of_y_points) ) # invertiti perché l'asse è invertito
+        ax.grid("True")
+        ax.axhline(0, color='grey', linewidth=2)
+        #ax.vlines(cum_lenghts, ymin=y_min, ymax=y_max,linestyles='dotted')
+        #ax.set_xticklabels(cum_lenghts) # per il nome campata magari
+        ax.set_xticks(cum_lenghts) #TODO aggiungere xthick nel massimo in mezzeria
+        #ax.set_yticks(np.arange(-300, 250, step=50)) #TODO
+        ax.set_xlabel(r"$L$")
+        ax.set_ylabel(r"$M$") #TODO aggiungere l'if se si usa per il taglio
+        return  fig, ax
+
+    def plot_bending_moment_beam_Q_1(self):
+        """Plot the bending_moment_beam_Q_1() using my_plot_style"""
+        y_points = self.bending_moment_beam_Q_1()
+        fig, ax = self.my_plot_style(y_points)
+
+        ax.set_title("Carichi unitari")
+        ax.fill_between(self.s_func, y_points , linewidth=0, color='r')
+        plt.show()
+        plt.close()
+        return  fig 
+    
+    def plot_inviluppo(self):
+        """Plot the inviluppo() using my_plot_style"""
+        list_of_y_point = self.inviluppo()
+        fig, ax = self.my_plot_style(list_of_y_point)
+
+        ax.set_title("Inviluppo")
+        for y_plot in list_of_y_point:
+            ax.fill_between(self.s_func, y_plot , linewidth=0, color='r')
+        plt.show()
+        plt.close()
+        return  fig
 
 
 J = (0.3 * 0.5**3)/12 # m4
@@ -451,9 +490,8 @@ def run(beam: Beam):
     print(f"R = {r}")
 
     M = BendingMoment(beam, x, r)
-    M.plot_bending_moment_beam_Q(M.inviluppo()[0])
-    M.plot_bending_moment_beam_Q(M.inviluppo()[1])
-    
+    M.plot_bending_moment_beam_Q_1()
+    M.plot_inviluppo()
 
 run(trave)
 
