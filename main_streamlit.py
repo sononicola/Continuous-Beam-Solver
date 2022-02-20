@@ -2,7 +2,7 @@ import streamlit as st
 import numpy as np
 import sympy as sp
 import matplotlib.pyplot as plt
-from solver import Span, Beam, Compute
+from solver import Span, Beam, Solver, BendingMoment
 
 
 # -- INIT --
@@ -47,7 +47,7 @@ with a3:
 
 
 # Every column creates a list 
-c1, c2 = st.columns(2)
+c1, c2, c3, c4 = st.columns(4)
 with c1:
     #st.write("Lenghts")
     lenghts = [
@@ -73,9 +73,35 @@ with c2:
             )
         for i in range(1,nSpan+1)
         ]
+with c3:
+    #st.write("EJs")
+    q_max = [
+        st.number_input(
+            label = f"Q_max {i}",
+            value = 1.,
+            min_value = 1.,
+            step = 1.,
+            format = "%.3f",
+            key = f"q_max {i}"
+            )
+        for i in range(1,nSpan+1)
+        ]
+with c4:
+    #st.write("EJs")
+    q_min = [
+        st.number_input(
+            label = f"Q_min {i}",
+            value = 0.,
+            min_value = 0.,
+            step = 1.,
+            format = "%.3f",
+            key = f"q_min {i}"
+            )
+        for i in range(1,nSpan+1)
+        ]
 
 # List of Span objects created starting from each list taken above:
-spans = [Span(lenghts[i], ejs[i]) for i in range(nSpan)]
+spans = [Span(lenghts[i], ejs[i], q_max[i], q_min[i]) for i in range(nSpan)]
 
 # Add the spans list to the Beam object
 # beam.add_list_of_spans(spans)
@@ -91,16 +117,25 @@ st.write(f"{beam.spans_q_max() = }")
 st.write(f"{beam.spans_q_min() = }")
 
 
-run = Compute(beam)
+sol = Solver(beam)
+x = sol.generate_expanded_x_solutions()
+r = sol.generate_R_solutions(x)
 
-st.write(f"{run.generate_Flex_matrix() = }")
-st.write(f"{run.generate_expanded_x_solutions() = }")
-st.write(f"{run.generate_R_solutions() = }")
 
-st.latex(f"Flex = {sp.latex(run.generate_Flex_matrix())}")
-st.latex(r"\textup{Flex} = " + sp.latex(run.generate_Flex_matrix()))
-st.latex(sp.latex(run.generate_Flex_matrix()) + r"\cdot \vec{X} = " + sp.latex(run.generate_P_vector_Q()))
-st.latex(f"X = {sp.latex(run.generate_expanded_x_solutions())}")
-st.latex(f"R = {sp.latex(run.generate_R_solutions())}")
 
-st.pyplot(run.plot_bending_moment_beam_Q())
+st.write(f"{sol.generate_Flex_matrix() = }")
+st.write(f"{x = }")
+st.write(f"{r = }")
+
+
+M = BendingMoment(beam, x, r)
+
+
+st.latex(f"Flex = {sp.latex(sol.generate_Flex_matrix())}")
+st.latex(r"\textup{Flex} = " + sp.latex(sol.generate_Flex_matrix()))
+st.latex(sp.latex(sol.generate_Flex_matrix()) + r"\cdot \vec{X} = " + sp.latex(sol.generate_P_vector_Q()))
+st.latex(f"X = {sp.latex(sol.generate_expanded_x_solutions())}")
+st.latex(f"R = {sp.latex(sol.generate_R_solutions(x))}")
+
+st.pyplot(M.plot_bending_moment_beam_Q(M.bending_moment_beam_Q_1()))
+st.pyplot(M.plot_bending_moment_beam_Q(M.inviluppo()[0]))

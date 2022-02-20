@@ -2,6 +2,7 @@ import numpy as np
 import sympy as sp
 import matplotlib.pyplot as plt
 
+
 class Span:
     def __init__(self, lenght: float, ej: float, q_max: float = 0., q_min: float = 0.):
         self.lenght = lenght
@@ -67,6 +68,34 @@ class Beam:
     def spans_q_min(self) -> list:
         """Return a list with spans' q_min"""
         return [span.q_min for span in self.spans]
+
+    def combinations(self) -> list[list] :
+        q_max_list = self.spans_q_max()
+        q_min_list = self.spans_q_min()
+        nCampate =  len(self.spans)
+
+        #for testing:
+        #q_max_list = ["S1", "S2", "S3", "S4", "S5", "S6"]
+        #q_min_list = ["F1", "F2", "F3", "F4", "F5", "F6"]
+        #nCampate = 6        
+        
+        # S F S F S F ...
+        comb_1 = [q_max_list[i] if i%2 == 0 else q_min_list[i] for i in range(nCampate)]
+        # F S F S F S...
+        comb_2 = [q_max_list[i] if i%2 == 1 else q_min_list[i] for i in range(nCampate)]
+        # S S F S F S...
+        comb_3 = [q_max_list[0]]
+        comb_3.extend([q_max_list[i] if i%2 == 1 else q_min_list[i] for i in range(1,nCampate)])
+
+        comb_3 = [q_max_list[i] if i%2 == 1 else q_min_list[i] for i in range(nCampate)]
+        comb_3[0] = q_max_list[0]
+
+
+
+        print(comb_1)
+        print(comb_2)
+        print(comb_3)
+        return [comb_1,comb_2]
 
     # --- REAL SOLVING METHODS: ---
     # Using sympy:  symbolic -> reduced with BC -> subsituted with numeric values ->  solved the system ->  expanded to initial lenghts row, columns
@@ -259,7 +288,17 @@ class Solver:
             mat2 = sp.Matrix(lenghts[n_span]/2 * np.identity(nCampate)[n_span])
             list_of_R.append(mat1 + mat2)
         return list_of_R
-          
+
+class BendingMoment:
+    def __init__(self, beam:Beam, x:list[sp.Matrix], r:list[sp.Matrix]):
+        """x and r have solutions taken from Solve.generate_expanded_x_solutions() 
+        and Solve.generate_R_solutions(x)"""
+
+        self.beam = beam
+        self.nCampate =  len(beam.spans)
+        self.x = x
+        self.r = r
+
     def bending_moment_span_Q_1(self, span_Q : int): #TODO _1 _func
         """
         Compute the bending_moment_Q lamdified function for a "span_Q", 
@@ -271,8 +310,8 @@ class Solver:
         cum_lenghts = self.beam.spans_cum_lenght()
         total_lenght = self.beam.spans_total_lenght()
 
-        x = self.generate_expanded_x_solutions() # List of matrixes
-        r = self.generate_R_solutions() # List of matrixes
+        x = self.x # List of matrixes
+        r = self.r # List of matrixes
      
         I = np.identity(nCampate)
         #span_i = 1 # campata vera
@@ -312,48 +351,10 @@ class Solver:
         m_tot_1 = np.sum([self.bending_moment_span_Q_1(span_Q = span)(s_func) for span in range(nCampate)], axis=0)
         return s_func, m_tot_1 #TODO m_beam_Q_1
     
-    def combinations(self):
-        q_max_list = self.beam.spans_q_max()
-        q_min_list = self.beam.spans_q_min()
-        #nCampate =  self.nCampate
-
-        #for testing:
-        #q_max_list = ["S1", "S2", "S3", "S4", "S5", "S6"]
-        #q_min_list = ["F1", "F2", "F3", "F4", "F5", "F6"]
-        nCampate = 6        
-        
-        # S F S F S F ...
-        comb_1 = [q_max_list[i] if i%2 == 0 else q_min_list[i] for i in range(nCampate)]
-        # F S F S F S...
-        comb_2 = [q_max_list[i] if i%2 == 1 else q_min_list[i] for i in range(nCampate)]
-        # S S F S F S...
-        comb_3 = [q_max_list[0]]
-        comb_3.extend([q_max_list[i] if i%2 == 1 else q_min_list[i] for i in range(1,nCampate)])
-
-        comb_3 = [q_max_list[i] if i%2 == 1 else q_min_list[i] for i in range(nCampate)]
-        comb_3[0] = q_max_list[0]
-
-
-
-        print(comb_1)
-        print(comb_2)
-        print(comb_3)
-        return [comb_1,comb_2]
-
-    def inviluppo(self, s):
-        total_lenght = self.beam.spans_total_lenght()
-        s = np.arange(0, total_lenght, .001)
-
-        combinations = self.combinations()
-        inviluppo_pos = np.max([self.bending_moment_beam_Q_real_values(combinations[comb]) for comb in range(len(combinations))], axis=0)
-        inviluppo_neg = np.min([self.bending_moment_beam_Q_real_values(combinations[comb]) for comb in range(len(combinations))], axis=0)
-
-        return inviluppo_pos, inviluppo_neg
-
     #def inviluppo_plot()
 
     def bending_moment_beam_Q_real_values(self, combination):
-        """"
+        """
         Return X,Y values of bending moment with the valuesof Q load substituted for each span
         """
         nCampate =  self.nCampate
@@ -363,6 +364,17 @@ class Solver:
         m_tot_Q_values = np.sum([combination[span] * self.bending_moment_span_Q_1(span_Q = span)(s_func) for span in range(nCampate)], axis=0)
 
         return s_func, m_tot_Q_values
+
+    def inviluppo(self): #TODO nome inviluppo
+        """For each combination substitute the real values of Q and then create the y+ and y- of the inviluppo"""
+        total_lenght = self.beam.spans_total_lenght()
+        #s = np.arange(0, total_lenght, .001)
+
+        combinations = self.beam.combinations()
+        inviluppo_pos = np.max([self.bending_moment_beam_Q_real_values(combinations[comb]) for comb in range(len(combinations))], axis=0)
+        inviluppo_neg = np.min([self.bending_moment_beam_Q_real_values(combinations[comb]) for comb in range(len(combinations))], axis=0)
+
+        return inviluppo_pos, inviluppo_neg
 
     def plot_bending_moment_beam_Q(self,  list_of_xy_points): #TODO trasformarlo in un plot generico e metterlo in una sua classe
 
@@ -374,7 +386,7 @@ class Solver:
         # y_limits for ax.vlines:
         #y_min = 1.1 * np.min(y)
         #y_max = 1.1 * np.max(y) 
-        #plt.style.use('seaborn-poster')
+        plt.style.use('seaborn-poster')
 
         fig, ax = plt.subplots(1,1, figsize = (10, 5))
         #ax.plot(x,y)
@@ -419,37 +431,33 @@ c_6 = Span(lenght = 4.00, ej = EJ, q_max=LOAD_S_C, q_min=LOAD_F_C)
 
 trave = Beam(spans = [c_1, c_2, c_3, c_4, c_5, c_6], supports='incastre-right')
 
+
+def testing(beam: Beam):
+    print(f"{beam.spans_lenght() = }")
+    print(f"{beam.spans_total_lenght() = }")
+    print(f"{beam.spans_q_min() = }")
+    print(f"{beam.spans_cum_lenght() = }")
+    print(f"{beam.spans_ej() = }")
+    print(f"{beam.spans_q_max() = }")
+    print(f"{beam.combinations() = }")
+#testing(trave)
+#quit()
+
 def run(beam: Beam):
-    solve = Solver(beam)
-    x = solve.generate_expanded_x_solutions()
+    sol = Solver(beam)
+    x = sol.generate_expanded_x_solutions()
     print(f"x = {x}")
-    r = solve.generate_R_solutions(x)
+    r = sol.generate_R_solutions(x)
     print(f"R = {r}")
 
+    M = BendingMoment(beam, x, r)
+    M.plot_bending_moment_beam_Q(M.inviluppo()[0])
+    M.plot_bending_moment_beam_Q(M.inviluppo()[1])
+    
+
 run(trave)
-quit()
 
-run = Solver(trave)
-print(f"{trave.spans_lenght() = }")
-print(f"{trave.spans_total_lenght() = }")
-print(f"{trave.spans_cum_lenght() = }")
-print(f"{trave.spans_ej() = }")
-print(f"{trave.spans_q_max() = }")
-print(f"{trave.spans_q_min() = }")
 
-#print("x",run.generate_expanded_x_solutions())
-#print("R",run.generate_R_solutions())
+#trave.combinations()
 
-#print(run.bending_moment_span_Q(0))
-#plt.plot(run.bending_moment_span_Q(0))
 
-#s_func = np.arange(0, 26.5, .001)
-#for i in range(6):
- #   m = run.bending_moment_span_Q(span_Q=i)(s_func)
- #   plt.plot(s_func,m)
- #   plt.show()
- #   plt.close()
-#print(run.bending_moment_beam_Q_1())
-
-run.combinations()
-run.plot_bending_moment_beam_Q(run.bending_moment_beam_Q_1())
