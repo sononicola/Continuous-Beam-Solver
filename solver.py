@@ -15,9 +15,13 @@ class Span:
         pass
 
 class Beam: 
-    def __init__(self, spans: list[Span] , supports: str = "no-incastre"):
+    def __init__(self, spans: list[Span], left_support: str, right_support: str):
+        """
+        Avaiable left and right supports: "Simple", "Fixed". "Free" not implemented yet!" 
+        """
         self.spans = spans
-        self.supports = supports # suddividere in  left and right
+        self.left_support = left_support
+        self.right_support = right_support
 
     def get_spans(self): # boh non servirà credo
         return self.spans
@@ -142,7 +146,7 @@ class Solver:
         self.beam = beam
         self.nCampate =  len(beam.spans)
         
-    def generate_simbolic_variables(self):
+    def generate_simbolic_variables(self): #TODO mettere altre condizioni alle variabili?
         nCampate =  self.nCampate
         L   = sp.Matrix(nCampate, 1, [sp.symbols(f"L_{i}",real="True",nonnegative="True") for i in range(1, nCampate+1)]   )
         P   = sp.Matrix(nCampate, 1, [sp.symbols(f"P_{i}") for i in range(1, nCampate+1)]   )
@@ -198,20 +202,22 @@ class Solver:
 
     def generate_reduced_Flex_matrix_and_P_vector(self):
         nCampate =  self.nCampate
-        supports = self.beam.supports
+        left_support = self.beam.left_support
+        right_support = self.beam.right_support
         flex_gen  = self.generate_Flex_matrix()
         P_gen = self.generate_P_vector_Q()
 
-        if supports == "no-incastre":
+        #TODO aggiungere il Free support
+        if left_support == "Simple" and right_support == "Simple":
             flex_rid = flex_gen[1:nCampate,1:nCampate]
             P_rid    = P_gen[1:nCampate]
-        elif supports == "incastre-left":   
+        elif left_support == "Fixed" and right_support == "Simple":   
             flex_rid =  flex_gen[0:nCampate,0:nCampate]
             P_rid    = P_gen[0:nCampate]
-        elif supports == "incastre-right":
+        elif left_support == "Simple" and right_support == "Fixed":
             flex_rid = flex_gen[1:nCampate+1,1:nCampate+1]
             P_rid    = P_gen[1:nCampate+1]
-        elif supports == "double-incastre":
+        elif left_support == "Fixed" and right_support == "Fixed":
             flex_rid = sp.Matrix.copy(flex_gen)
             P_rid    = sp.Matrix.copy(P_gen)
 
@@ -257,20 +263,24 @@ class Solver:
         In base of boundary conditions return to initial lenghts the x_solution_vectors calculated in generate_reduced_x_solutions(self)
         """
         nCampate =  self.nCampate
-        supports = self.beam.supports
+        left_support = self.beam.left_support
+        right_support = self.beam.right_support
         list_of_reduced_x_solution_vectors = self.generate_reduced_x_solutions()
 
-    # init identic of the reduced list and then add or not the zeros
-        list_of_expanded_x_solution_vectors = list_of_reduced_x_solution_vectors
+    # init with an identic list of the reduced one, and then add or not the zeros
+        list_of_expanded_x_solution_vectors = list_of_reduced_x_solution_vectors #TODO
         for n_span in range(nCampate):
-            if supports == "no-incastre": # 0 prima e dopo -- damodificare
+            if left_support == "Simple" and right_support == "Simple": # 0 prima e dopo
+                list_of_expanded_x_solution_vectors[n_span] = sp.Matrix.vstack(sp.zeros(1,1), list_of_reduced_x_solution_vectors[n_span])
+                list_of_expanded_x_solution_vectors[n_span] = sp.Matrix.vstack(list_of_expanded_x_solution_vectors[n_span], sp.zeros(1,1))
 
+            elif left_support == "Fixed" and right_support == "Simple":   # 0 dopo
+                list_of_expanded_x_solution_vectors[n_span] = sp.Matrix.vstack(list_of_reduced_x_solution_vectors[n_span], sp.zeros(1,1))
+
+            elif left_support == "Simple" and right_support == "Fixed": # 0 prima
                 list_of_expanded_x_solution_vectors[n_span] = sp.Matrix.vstack(sp.zeros(1,1), list_of_reduced_x_solution_vectors[n_span])
-            elif supports == "incastre-left":   # 0 dopo
-                pass
-            elif supports == "incastre-right": # 0 prima
-                list_of_expanded_x_solution_vectors[n_span] = sp.Matrix.vstack(sp.zeros(1,1), list_of_reduced_x_solution_vectors[n_span])
-            elif supports == "double-incastre": # no 0
+
+            elif left_support == "Fixed" and right_support == "Fixed": # no 0
                 pass
 
         return list_of_expanded_x_solution_vectors
@@ -436,7 +446,7 @@ c_4 = Span(lenght = 5.00, ej = EJ, q_max=LOAD_S_B, q_min=LOAD_F_B)
 c_5 = Span(lenght = 6.15, ej = EJ, q_max=LOAD_S_C, q_min=LOAD_F_C)
 c_6 = Span(lenght = 4.00, ej = EJ, q_max=LOAD_S_C, q_min=LOAD_F_C)
 
-trave = Beam(spans = [c_1, c_2, c_3, c_4, c_5, c_6], supports='incastre-right')
+trave = Beam(spans = [c_1, c_2, c_3, c_4, c_5, c_6], left_support="Simple", right_support="Fixed")
 
 
 def testing(beam: Beam):
@@ -460,8 +470,8 @@ def run(beam: Beam):
     M = BendingMoment(beam, x, r)
     
     #M.plot_span_Q_1(0)
-    #M.plot_bending_moment_beam_Q_1()
-    M.plot_inviluppo()
+    M.plot_beam_Q_1()
+    #M.plot_inviluppo()
 
 run(trave)
 

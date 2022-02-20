@@ -21,7 +21,7 @@ st.set_page_config(
 st.title("Continuous beam solver")
 st.warning("💡 With lenght in meters and EJ in kN/m2, then M will be in .. and V in ..")
 
-supports_list = ["free", "simple support" , "encastre"] # Cambiare i nomi con più decenti 
+supports_list = ["Simple", "Fixed"] # ["Free", "Simple", "Fixed"] 
 a1, a2, a3 = st.columns(3)
 with a1:
     left_support = st.selectbox(
@@ -107,7 +107,7 @@ spans = [Span(lenghts[i], ejs[i], q_max[i], q_min[i]) for i in range(nSpan)]
 # beam.add_list_of_spans(spans)
 
 # Solo per test dato che gli if sono ancora da sistemare :
-beam  = Beam(spans, supports='incastre-right')  #TODO da capire se meglio all'inizio eaggiunto o subito qui
+beam  = Beam(spans=spans, left_support=left_support, right_support=right_support)  #TODO da capire se meglio all'inizio eaggiunto o subito qui
 
 st.write(f"{beam.spans_lenght() = }")
 st.write(f"{beam.spans_total_lenght() = }")
