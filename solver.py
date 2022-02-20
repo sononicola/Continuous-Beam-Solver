@@ -225,7 +225,7 @@ class Solver:
         P_rid = sp.Matrix(P_rid)
         return flex_rid, P_rid
 
-    def generate_reduced_x_solutions(self) -> list:
+    def generate_reduced_x_solutions(self) -> list[sp.Matrix]:
         nCampate =  self.nCampate
         L, P, Q, EJ = self.generate_simbolic_variables()
         flex_rid, P_rid = self.generate_reduced_Flex_matrix_and_P_vector()
@@ -254,7 +254,6 @@ class Solver:
 
             # solve the system: # --- maybe there is a more efificient way 
             x = - flex_sub.inv() * P_sub
-
             list_of_reduced_x_solution_vectors.append(x)
         return list_of_reduced_x_solution_vectors
 
@@ -271,8 +270,14 @@ class Solver:
         list_of_expanded_x_solution_vectors = list_of_reduced_x_solution_vectors #TODO
         for n_span in range(nCampate):
             if left_support == "Simple" and right_support == "Simple": # 0 prima e dopo
-                list_of_expanded_x_solution_vectors[n_span] = sp.Matrix.vstack(sp.zeros(1,1), list_of_reduced_x_solution_vectors[n_span])
-                list_of_expanded_x_solution_vectors[n_span] = sp.Matrix.vstack(list_of_expanded_x_solution_vectors[n_span], sp.zeros(1,1))
+                # if there is only one span and no-incastre: 
+                # 'list_of_reduced_x_solution_vectors' fails to compute an adeguated matrix beacuse there aren't solutions of the system, then 
+                # 'generate_expanded_x_solutions' and 'generate_R_solutions' give an index error. So with this if i'm overwriting directly this case
+                if self.nCampate > 1:
+                    list_of_expanded_x_solution_vectors[n_span] = sp.Matrix.vstack(sp.zeros(1,1), list_of_reduced_x_solution_vectors[n_span])
+                    list_of_expanded_x_solution_vectors[n_span] = sp.Matrix.vstack(list_of_expanded_x_solution_vectors[n_span], sp.zeros(1,1))
+                else: 
+                    list_of_expanded_x_solution_vectors[n_span] = sp.zeros(1,2)
 
             elif left_support == "Fixed" and right_support == "Simple":   # 0 dopo
                 list_of_expanded_x_solution_vectors[n_span] = sp.Matrix.vstack(list_of_reduced_x_solution_vectors[n_span], sp.zeros(1,1))
@@ -416,7 +421,7 @@ class BendingMoment:
         fig, ax = Plot.plot_y_points(
                     s_func = self.s_func, 
                     y_points = self.bending_moment_span_Q_1(span_Q)(self.s_func), 
-                    title = "Carico unitario",
+                    title = f"Q = 1 only in span number {span_Q + 1}",
                     x_thicks = self.beam.spans_cum_lenght(), 
                     y_label = r"$M$", 
                     color = "r" )
@@ -477,5 +482,3 @@ run(trave)
 
 
 #trave.combinations()
-
-
