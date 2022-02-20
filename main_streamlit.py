@@ -5,9 +5,6 @@ import matplotlib.pyplot as plt
 from solver import Span, Beam, Solver, BendingMoment
 
 
-# -- INIT --
-beam = Beam([]) # every time some widget is clicked, streamlit re-start everything from here 
-
 # -- GENERAL PAGE SETUP --
 st.set_page_config(
      page_title = "Continuous beam solver",
@@ -100,14 +97,18 @@ with c4:
         for i in range(1,nSpan+1)
         ]
 
+# -- INIT OBJECTS --
+
 # List of Span objects created starting from each list taken above:
 spans = [Span(lenghts[i], ejs[i], q_max[i], q_min[i]) for i in range(nSpan)]
 
-# Add the spans list to the Beam object
+beam  = Beam(spans=spans, left_support=left_support, right_support=right_support) 
+
+# Alternative method: 
+# beam = Beam([], left_support=left_support, right_support=right_support)
 # beam.add_list_of_spans(spans)
 
-# Solo per test dato che gli if sono ancora da sistemare :
-beam  = Beam(spans=spans, left_support=left_support, right_support=right_support)  #TODO da capire se meglio all'inizio eaggiunto o subito qui
+# -- RESULTS --
 
 st.write(f"{beam.spans_lenght() = }")
 st.write(f"{beam.spans_total_lenght() = }")
@@ -116,17 +117,13 @@ st.write(f"{beam.spans_ej() = }")
 st.write(f"{beam.spans_q_max() = }")
 st.write(f"{beam.spans_q_min() = }")
 
-
 sol = Solver(beam)
 x = sol.generate_expanded_x_solutions()
 r = sol.generate_R_solutions(x)
 
-
-
 st.write(f"{sol.generate_Flex_matrix() = }")
 st.write(f"{x = }")
 st.write(f"{r = }")
-
 
 M = BendingMoment(beam, x, r)
 
@@ -137,5 +134,8 @@ st.latex(sp.latex(sol.generate_Flex_matrix()) + r"\cdot \vec{X} = " + sp.latex(s
 st.latex(f"X = {sp.latex(sol.generate_expanded_x_solutions())}")
 st.latex(f"R = {sp.latex(sol.generate_R_solutions(x))}")
 
+with st.expander("👉 Click to see plots where Q = 1 is applied in each span"):
+    for span in range(len(beam.spans)):
+        st.pyplot(M.plot_span_Q_1(span))
 st.pyplot(M.plot_beam_Q_1())
 st.pyplot(M.plot_inviluppo())
