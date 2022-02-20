@@ -107,7 +107,7 @@ class Beam:
 
     # Disegno tikz
 
-class Compute:
+class Solver:
     def __init__(self,beam: Beam):
         self.beam = beam
         self.nCampate =  len(beam.spans)
@@ -151,6 +151,7 @@ class Compute:
             flex_gen[i+1,i] = flex_lowerdiag[i]
 
         return flex_gen
+
     def generate_P_vector_Q(self) -> sp.Matrix:
         L, P, Q, EJ = self.generate_simbolic_variables()
         nCampate =  self.nCampate
@@ -164,6 +165,7 @@ class Compute:
         P_dx = sp.Matrix.vstack(P_dx , sp.zeros(1,1)) 
 
         return P_sx  + P_dx
+
     def generate_reduced_Flex_matrix_and_P_vector(self):
         nCampate =  self.nCampate
         supports = self.beam.supports
@@ -219,7 +221,8 @@ class Compute:
 
             list_of_reduced_x_solution_vectors.append(x)
         return list_of_reduced_x_solution_vectors
-    def generate_expanded_x_solutions(self) -> list:
+
+    def generate_expanded_x_solutions(self) -> list[sp.Matrix]:
         """
         In base of boundary conditions return to initial lenghts the x_solution_vectors calculated in generate_reduced_x_solutions(self)
         """
@@ -242,12 +245,12 @@ class Compute:
 
         return list_of_expanded_x_solution_vectors
 
-    def generate_R_solutions(self) -> list:
+    def generate_R_solutions(self, x:list[sp.Matrix]) -> list[sp.Matrix]:
         """
         R
         """
         nCampate =  self.nCampate
-        x = self.generate_expanded_x_solutions()
+        #x = self.generate_expanded_x_solutions()
         lenghts = self.beam.spans_lenght() 
 
         list_of_R = [] # ---- oppure mettere - X + L/2: 
@@ -257,9 +260,10 @@ class Compute:
             list_of_R.append(mat1 + mat2)
         return list_of_R
           
-    def bending_moment_span_Q(self, span_Q : int):
+    def bending_moment_span_Q_1(self, span_Q : int): #TODO _1 _func
         """
-        span_Q is the span where the distribuited load Q is applied
+        Compute the bending_moment_Q lamdified function for a "span_Q", 
+        which is the span where the distribuited load Q is applied and the others Q is zero
         """
         # TODO togliere i commentati
         nCampate =  self.nCampate
@@ -280,7 +284,7 @@ class Compute:
                     * (sp.Heaviside(s-cum_lenghts[n_span]) - sp.Heaviside(s-cum_lenghts[n_span+1])) \
                 for n_span in range(nCampate)
             ]
-        m_i_lambdify = sp.lambdify(s,-np.sum(m_i,axis=0))
+        m_i_lambdify = sp.lambdify(s,np.sum(m_i,axis=0))
         s_lambdify  = np.linspace(0, total_lenght, 1000)
     # ---- With numpy: TODO maybe. doesnt work as expected the heaviside func
         #s = np.linspace(0, total_lenght, 1000)
@@ -294,38 +298,138 @@ class Compute:
         # Example from numpy documentation: np.sum([[0, 1], [0, 5]], axis=0) >>> array([0, 6])
         #return np.sum(m_i,axis=0) 
 
-        return m_i_lambdify
+        return m_i_lambdify #TODO m_span_Q_1
 
-    def bending_moment_beam_Q(self): #TODO  
+    def bending_moment_beam_Q_1(self) -> list: #TODO  _1 _func + dividere 
+        """"
+        Return X,Y values of bending moment with unitary Q load for the entire beam. It takes the values from bending_moment_span_Q
+        """
         nCampate =  self.nCampate
-        return [self.bending_moment_span_Q(span_Q) for span_Q in range(nCampate)]
-
-    def plot_bending_moment_beam_Q(self):
-        nCampate =  self.nCampate 
         total_lenght = self.beam.spans_total_lenght()
 
         s_func = np.arange(0, total_lenght, .001)
-        m_tot_un = np.sum([self.bending_moment_span_Q(span_Q = span)(s_func) for span in range(nCampate)], axis=0)
+        # substituting s_func points into the lambdify function -> list of Y points
+        m_tot_1 = np.sum([self.bending_moment_span_Q_1(span_Q = span)(s_func) for span in range(nCampate)], axis=0)
+        return s_func, m_tot_1 #TODO m_beam_Q_1
+    
+    def combinations(self):
+        q_max_list = self.beam.spans_q_max()
+        q_min_list = self.beam.spans_q_min()
+        #nCampate =  self.nCampate
 
-        fig = plt.figure(figsize = (10, 5))
-        plt.plot(s_func,m_tot_un)
-        plt.axhline(0, color='black')
-        plt.show()
+        #for testing:
+        #q_max_list = ["S1", "S2", "S3", "S4", "S5", "S6"]
+        #q_min_list = ["F1", "F2", "F3", "F4", "F5", "F6"]
+        nCampate = 6        
         
-        return fig
+        # S F S F S F ...
+        comb_1 = [q_max_list[i] if i%2 == 0 else q_min_list[i] for i in range(nCampate)]
+        # F S F S F S...
+        comb_2 = [q_max_list[i] if i%2 == 1 else q_min_list[i] for i in range(nCampate)]
+        # S S F S F S...
+        comb_3 = [q_max_list[0]]
+        comb_3.extend([q_max_list[i] if i%2 == 1 else q_min_list[i] for i in range(1,nCampate)])
+
+        comb_3 = [q_max_list[i] if i%2 == 1 else q_min_list[i] for i in range(nCampate)]
+        comb_3[0] = q_max_list[0]
+
+
+
+        print(comb_1)
+        print(comb_2)
+        print(comb_3)
+        return [comb_1,comb_2]
+
+    def inviluppo(self, s):
+        total_lenght = self.beam.spans_total_lenght()
+        s = np.arange(0, total_lenght, .001)
+
+        combinations = self.combinations()
+        inviluppo_pos = np.max([self.bending_moment_beam_Q_real_values(combinations[comb]) for comb in range(len(combinations))], axis=0)
+        inviluppo_neg = np.min([self.bending_moment_beam_Q_real_values(combinations[comb]) for comb in range(len(combinations))], axis=0)
+
+        return inviluppo_pos, inviluppo_neg
+
+    #def inviluppo_plot()
+
+    def bending_moment_beam_Q_real_values(self, combination):
+        """"
+        Return X,Y values of bending moment with the valuesof Q load substituted for each span
+        """
+        nCampate =  self.nCampate
+        total_lenght = self.beam.spans_total_lenght()
+        s_func = np.arange(0, total_lenght, .001)
+        #Q_list = self.combinations()[1]
+        m_tot_Q_values = np.sum([combination[span] * self.bending_moment_span_Q_1(span_Q = span)(s_func) for span in range(nCampate)], axis=0)
+
+        return s_func, m_tot_Q_values
+
+    def plot_bending_moment_beam_Q(self,  list_of_xy_points): #TODO trasformarlo in un plot generico e metterlo in una sua classe
+
+        #nCampate =  self.nCampate 
+        #total_lenght = self.beam.spans_total_lenght()
+        x, y =  list_of_xy_points
+        cum_lenghts = self.beam.spans_cum_lenght()
+
+        # y_limits for ax.vlines:
+        #y_min = 1.1 * np.min(y)
+        #y_max = 1.1 * np.max(y) 
+        #plt.style.use('seaborn-poster')
+
+        fig, ax = plt.subplots(1,1, figsize = (10, 5))
+        #ax.plot(x,y)
+        ax.fill_between(x, y , linewidth=0, color='r')
+        ax.invert_yaxis()
+        ax.set_xlim(cum_lenghts[0], cum_lenghts[-1])
+        ax.set_ylim(max(y), min(y) ) # invertiti perché l'asse è invertito
+        ax.grid("True")
+        ax.axhline(0, color='grey', linewidth=2)
+        #ax.vlines(cum_lenghts, ymin=y_min, ymax=y_max,linestyles='dotted')
+        #ax.set_xticklabels(cum_lenghts) # per il nome campata magari
+        ax.set_xticks(cum_lenghts) #TODO aggiungere xthick nel massimo in mezzeria
+        #ax.set_yticks(np.arange(-300, 250, step=50)) #TODO
+        ax.set_xlabel(r"$L$")
+        ax.set_ylabel(r"$M$") #TODO aggiungere l'if se si usa per il taglio
+        
+        
+        
+        plt.show()
+        return fig #,ax
+
+
 J = (0.3 * 0.5**3)/12 # m4
 EJ =  31476*1000000*J/1000 # Mpa * m4 -> N*m2 -> kN*m2
 
-c_1 = Span(lenght = 3.00, ej = EJ)
-c_2 = Span(lenght = 4.50, ej = EJ)
-c_3 = Span(lenght = 4.00, ej = EJ)
-c_4 = Span(lenght = 5.00, ej = EJ)
-c_5 = Span(lenght = 6.15, ej = EJ)
-c_6 = Span(lenght = 4.00, ej = EJ)
+#Campate 1,2,3
+LOAD_S_A=114.972
+LOAD_F_A=46.342
+#Campata 4 con M4
+LOAD_S_B=90.22675
+LOAD_F_B=38.584
+#Campate 5,6
+LOAD_S_C=71.935
+LOAD_F_C=32.67
+
+c_1 = Span(lenght = 3.00, ej = EJ, q_max=LOAD_S_A, q_min=LOAD_F_A)
+c_2 = Span(lenght = 4.50, ej = EJ, q_max=LOAD_S_A, q_min=LOAD_F_A)
+c_3 = Span(lenght = 4.00, ej = EJ, q_max=LOAD_S_A, q_min=LOAD_F_A)
+c_4 = Span(lenght = 5.00, ej = EJ, q_max=LOAD_S_B, q_min=LOAD_F_B)
+c_5 = Span(lenght = 6.15, ej = EJ, q_max=LOAD_S_C, q_min=LOAD_F_C)
+c_6 = Span(lenght = 4.00, ej = EJ, q_max=LOAD_S_C, q_min=LOAD_F_C)
 
 trave = Beam(spans = [c_1, c_2, c_3, c_4, c_5, c_6], supports='incastre-right')
 
-run = Compute(trave)
+def run(beam: Beam):
+    solve = Solver(beam)
+    x = solve.generate_expanded_x_solutions()
+    print(f"x = {x}")
+    r = solve.generate_R_solutions(x)
+    print(f"R = {r}")
+
+run(trave)
+quit()
+
+run = Solver(trave)
 print(f"{trave.spans_lenght() = }")
 print(f"{trave.spans_total_lenght() = }")
 print(f"{trave.spans_cum_lenght() = }")
@@ -333,8 +437,8 @@ print(f"{trave.spans_ej() = }")
 print(f"{trave.spans_q_max() = }")
 print(f"{trave.spans_q_min() = }")
 
-print("x",run.generate_expanded_x_solutions())
-print("R",run.generate_R_solutions())
+#print("x",run.generate_expanded_x_solutions())
+#print("R",run.generate_R_solutions())
 
 #print(run.bending_moment_span_Q(0))
 #plt.plot(run.bending_moment_span_Q(0))
@@ -345,5 +449,7 @@ print("R",run.generate_R_solutions())
  #   plt.plot(s_func,m)
  #   plt.show()
  #   plt.close()
+#print(run.bending_moment_beam_Q_1())
 
-run.plot_bending_moment_beam_Q()
+run.combinations()
+run.plot_bending_moment_beam_Q(run.bending_moment_beam_Q_1())

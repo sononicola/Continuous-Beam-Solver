@@ -97,8 +97,10 @@ st.write(f"{run.generate_Flex_matrix() = }")
 st.write(f"{run.generate_expanded_x_solutions() = }")
 st.write(f"{run.generate_R_solutions() = }")
 
-st.latex(sp.latex(run.generate_Flex_matrix()))
-st.latex(sp.latex(run.generate_expanded_x_solutions()))
-st.latex(sp.latex(run.generate_R_solutions()))
+st.latex(f"Flex = {sp.latex(run.generate_Flex_matrix())}")
+st.latex(r"\textup{Flex} = " + sp.latex(run.generate_Flex_matrix()))
+st.latex(sp.latex(run.generate_Flex_matrix()) + r"\cdot \vec{X} = " + sp.latex(run.generate_P_vector_Q()))
+st.latex(f"X = {sp.latex(run.generate_expanded_x_solutions())}")
+st.latex(f"R = {sp.latex(run.generate_R_solutions())}")
 
 st.pyplot(run.plot_bending_moment_beam_Q())
