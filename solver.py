@@ -1,6 +1,7 @@
 import numpy as np
 import sympy as sp
 import matplotlib.pyplot as plt
+from plotting import Plot
 
 
 class Span:
@@ -373,79 +374,46 @@ class BendingMoment:
         inviluppo_neg = np.min([self.bending_moment_beam_Q_real_values(combinations[comb]) for comb in range(len(combinations))], axis=0)
 
         return inviluppo_pos, inviluppo_neg
-
-    def plot_bending_moment_beam_Q(self, list_of_xy_points): #TODO trasformarlo in un plot generico e metterlo in una sua classe
-
-        #nCampate =  self.nCampate 
-        #total_lenght = self.beam.spans_total_lenght()
-        x, y =  list_of_xy_points
-        cum_lenghts = self.beam.spans_cum_lenght()
-
-        # y_limits for ax.vlines:
-        #y_min = 1.1 * np.min(y)
-        #y_max = 1.1 * np.max(y) 
-        plt.style.use('seaborn-poster')
-
-        fig, ax = plt.subplots(1,1, figsize = (10, 5))
-        #ax.plot(x,y)
-        ax.fill_between(x, y , linewidth=0, color='r')
-        ax.invert_yaxis()
-        ax.set_xlim(cum_lenghts[0], cum_lenghts[-1])
-        ax.set_ylim(max(y), min(y) ) # invertiti perché l'asse è invertito
-        ax.grid("True")
-        ax.axhline(0, color='grey', linewidth=2)
-        #ax.vlines(cum_lenghts, ymin=y_min, ymax=y_max,linestyles='dotted')
-        #ax.set_xticklabels(cum_lenghts) # per il nome campata magari
-        ax.set_xticks(cum_lenghts) #TODO aggiungere xthick nel massimo in mezzeria
-        #ax.set_yticks(np.arange(-300, 250, step=50)) #TODO
-        ax.set_xlabel(r"$L$")
-        ax.set_ylabel(r"$M$") #TODO aggiungere l'if se si usa per il taglio
-        
-        plt.show()
-        return fig #,ax
-
-    def my_plot_style(self, list_of_y_points: list[list] or list):
-        """This is just a style definitions for plot methods. 
-        list_of_y_points is an array of y points or a list of arrays of y points
-        """
-        cum_lenghts = self.beam.spans_cum_lenght()
-
-        fig, ax = plt.subplots(1,1, figsize = (10, 5))
-        ax.invert_yaxis()
-        ax.set_xlim(cum_lenghts[0], cum_lenghts[-1])
-        ax.set_ylim(np.max(list_of_y_points), np.min(list_of_y_points) ) # invertiti perché l'asse è invertito
-        ax.grid("True")
-        ax.axhline(0, color='grey', linewidth=2)
-        #ax.vlines(cum_lenghts, ymin=y_min, ymax=y_max,linestyles='dotted')
-        #ax.set_xticklabels(cum_lenghts) # per il nome campata magari
-        ax.set_xticks(cum_lenghts) #TODO aggiungere xthick nel massimo in mezzeria
-        #ax.set_yticks(np.arange(-300, 250, step=50)) #TODO
-        ax.set_xlabel(r"$L$")
-        ax.set_ylabel(r"$M$") #TODO aggiungere l'if se si usa per il taglio
-        return  fig, ax
-
-    def plot_bending_moment_beam_Q_1(self):
-        """Plot the bending_moment_beam_Q_1() using my_plot_style"""
-        y_points = self.bending_moment_beam_Q_1()
-        fig, ax = self.my_plot_style(y_points)
-
-        ax.set_title("Carichi unitari")
-        ax.fill_between(self.s_func, y_points , linewidth=0, color='r')
-        plt.show()
-        plt.close()
-        return  fig 
     
     def plot_inviluppo(self):
-        """Plot the inviluppo() using my_plot_style"""
-        list_of_y_point = self.inviluppo()
-        fig, ax = self.my_plot_style(list_of_y_point)
-
-        ax.set_title("Inviluppo")
-        for y_plot in list_of_y_point:
-            ax.fill_between(self.s_func, y_plot , linewidth=0, color='r')
+        """Plot the inviluppo() using Plot.my_plot_style"""
+        fig, ax = Plot.plot_list_of_y_points(
+                    s_func = self.s_func, 
+                    list_of_y_points = self.inviluppo(), 
+                    title = "Inviluppo",
+                    x_thicks = self.beam.spans_cum_lenght(), #aggiungere qui gli altri punti
+                    y_label = r"$M$", 
+                    color = "r" )
         plt.show()
         plt.close()
         return  fig
+
+    def plot_beam_Q_1(self):
+        """Plot the bending_moment_beam_Q_1() using Plot.my_plot_style"""
+        fig, ax = Plot.plot_y_points(
+                    s_func = self.s_func, 
+                    y_points = self.bending_moment_beam_Q_1(), 
+                    title = "Carico unitario",
+                    x_thicks = self.beam.spans_cum_lenght(), 
+                    y_label = r"$M$", 
+                    color = "r" )
+        plt.show()
+        plt.close()
+        return  fig
+    
+    def plot_span_Q_1(self, span_Q:int):
+        """Plot the bending_moment_span_Q_1(span_Q) using Plot.my_plot_style. The first span is 0"""
+        fig, ax = Plot.plot_y_points(
+                    s_func = self.s_func, 
+                    y_points = self.bending_moment_span_Q_1(span_Q)(self.s_func), 
+                    title = "Carico unitario",
+                    x_thicks = self.beam.spans_cum_lenght(), 
+                    y_label = r"$M$", 
+                    color = "r" )
+        plt.show()
+        plt.close()
+        return  fig
+
 
 
 J = (0.3 * 0.5**3)/12 # m4
@@ -490,7 +458,9 @@ def run(beam: Beam):
     print(f"R = {r}")
 
     M = BendingMoment(beam, x, r)
-    M.plot_bending_moment_beam_Q_1()
+    
+    #M.plot_span_Q_1(0)
+    #M.plot_bending_moment_beam_Q_1()
     M.plot_inviluppo()
 
 run(trave)

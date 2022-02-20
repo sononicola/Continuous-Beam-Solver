@@ -137,5 +137,5 @@ st.latex(sp.latex(sol.generate_Flex_matrix()) + r"\cdot \vec{X} = " + sp.latex(s
 st.latex(f"X = {sp.latex(sol.generate_expanded_x_solutions())}")
 st.latex(f"R = {sp.latex(sol.generate_R_solutions(x))}")
 
-st.pyplot(M.plot_bending_moment_beam_Q_1())
+st.pyplot(M.plot_beam_Q_1())
 st.pyplot(M.plot_inviluppo())
