@@ -385,8 +385,16 @@ class BendingMoment:
         #total_lenght = self.beam.spans_total_lenght()
 
         combinations = self.beam.combinations()
-        inviluppo_pos = np.max([self.bending_moment_beam_Q_real_values(combinations[comb]) for comb in range(len(combinations))], axis=0)
-        inviluppo_neg = np.min([self.bending_moment_beam_Q_real_values(combinations[comb]) for comb in range(len(combinations))], axis=0)
+        # TODO da capire se ha senso o no togliere quela parte di grafico
+        # the param 'initial=0' is used for: 
+        # in np.max:   if y[i] < 0 then y[i] = 0 else y[i] = y[i]
+        # in np.min:   if y[i] > 0 then y[i] = 0 else y[i] = y[i]
+        inviluppo_pos = np.max([self.bending_moment_beam_Q_real_values(combinations[comb]) for comb in range(len(combinations))], axis=0, initial=0)
+        inviluppo_neg = np.min([self.bending_moment_beam_Q_real_values(combinations[comb]) for comb in range(len(combinations))], axis=0, initial=0)
+
+        #inviluppo_pos = [inviluppo_max[i] if inviluppo_max[i] >  inviluppo_min[i] else inviluppo_min[i] for i in range(len(inviluppo_max))]
+        #inviluppo_neg = [inviluppo_max[i] if inviluppo_max[i] <  inviluppo_min[i] else inviluppo_min[i] for i in range(len(inviluppo_max))]
+        #inviluppo_pos = [0. if inviluppo_max[i] < 0  else inviluppo_max[i] for i in range(len(inviluppo_max))]
 
         return inviluppo_pos, inviluppo_neg
     
