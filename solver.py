@@ -1,9 +1,11 @@
 import numpy as np
 import sympy as sp
 import matplotlib.pyplot as plt
+
 from plotting import Plot
+from utils import *
 
-
+from tables import Table
 class Span:
     def __init__(self, lenght: float, ej: float, q_max: float = 0., q_min: float = 0.):
         self.lenght = lenght
@@ -97,9 +99,9 @@ class Beam:
 
 
 
-        print(comb_1)
-        print(comb_2)
-        print(comb_3)
+        #print(comb_1)
+        #print(comb_2)
+        #print(comb_3)
         return [comb_1,comb_2]
 
     # --- REAL SOLVING METHODS: ---
@@ -277,7 +279,7 @@ class Solver:
                     list_of_expanded_x_solution_vectors[n_span] = sp.Matrix.vstack(sp.zeros(1,1), list_of_reduced_x_solution_vectors[n_span])
                     list_of_expanded_x_solution_vectors[n_span] = sp.Matrix.vstack(list_of_expanded_x_solution_vectors[n_span], sp.zeros(1,1))
                 else: 
-                    list_of_expanded_x_solution_vectors[n_span] = sp.zeros(1,2)
+                    list_of_expanded_x_solution_vectors[n_span] = sp.zeros(2,1)
 
             elif left_support == "Fixed" and right_support == "Simple":   # 0 dopo
                 list_of_expanded_x_solution_vectors[n_span] = sp.Matrix.vstack(list_of_reduced_x_solution_vectors[n_span], sp.zeros(1,1))
@@ -385,7 +387,7 @@ class BendingMoment:
         #total_lenght = self.beam.spans_total_lenght()
 
         combinations = self.beam.combinations()
-        # TODO da capire se ha senso o no togliere quela parte di grafico
+        # TODO da capire se ha senso o no togliere questa parte di grafico:
         # the param 'initial=0' is used for: 
         # in np.max:   if y[i] < 0 then y[i] = 0 else y[i] = y[i]
         # in np.min:   if y[i] > 0 then y[i] = 0 else y[i] = y[i]
@@ -403,7 +405,7 @@ class BendingMoment:
         fig, ax = Plot.plot_list_of_y_points(
                     s_func = self.s_func, 
                     list_of_y_points = self.inviluppo(), 
-                    title = "Inviluppo",
+                    title =r"\bf{Inviluppo}",
                     x_thicks = self.beam.spans_cum_lenght(), #aggiungere qui gli altri punti
                     y_label = r"$M$", 
                     color = "r" )
@@ -462,6 +464,7 @@ c_6 = Span(lenght = 4.00, ej = EJ, q_max=LOAD_S_C, q_min=LOAD_F_C)
 trave = Beam(spans = [c_1, c_2, c_3, c_4, c_5, c_6], left_support="Simple", right_support="Fixed")
 
 
+
 def testing(beam: Beam):
     print(f"{beam.spans_lenght() = }")
     print(f"{beam.spans_total_lenght() = }")
@@ -476,17 +479,28 @@ def testing(beam: Beam):
 def run(beam: Beam):
     sol = Solver(beam)
     x = sol.generate_expanded_x_solutions()
-    print(f"x = {x}")
+    #print(f"x = {x}")
     r = sol.generate_R_solutions(x)
-    print(f"R = {r}")
+    #print(f"R = {r}")
 
     M = BendingMoment(beam, x, r)
     
     #M.plot_span_Q_1(0)
-    M.plot_beam_Q_1()
+    #M.plot_beam_Q_1()
     #M.plot_inviluppo()
 
+    print(find_local_max_xy(M.s_func, M.inviluppo()[0], 5, 26))
+    print(find_min_xy(M.s_func, M.inviluppo()[1]))
+
+    fig, ax = plt.subplots(1,1, figsize = (10, 5), tight_layout=True)
+    ax.invert_yaxis()
+    ax.fill_between(M.s_func, M.inviluppo()[0], color='r')
+    ax.fill_between(M.s_func, M.inviluppo()[1], color='b')
+    ax.axhline(0, color='grey', linewidth=2)
+    
+    plt.show()
+
+    x_row = Table.make_principal_row(x = M.s_func, y = M.inviluppo()[0],  cum_lenghts = trave.spans_cum_lenght())
+    print(x_row)
+
 run(trave)
-
-
-#trave.combinations()
