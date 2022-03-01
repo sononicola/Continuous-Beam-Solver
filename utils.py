@@ -49,6 +49,7 @@ def find_min_xy(x: list, y:list) -> tuple:
 def find_local_max_xy(x: np.array, y:np.array, a:float, b:float, tol:float) -> tuple: #TODO sistemare il typing
     """
     Find the local max y value of and x,y plot and the associated x, corresponding to limits: x==a and x==b 
+    Returns index, x(index), y(index) 
 
     x must be an np.array and should be an ordinated values array, like np.arange and np.linspace
 
@@ -56,24 +57,24 @@ def find_local_max_xy(x: np.array, y:np.array, a:float, b:float, tol:float) -> t
     b: the final value of x, not the corresponding index
     tol: tollerance due to approximation on x (made with arange). tol should be equal of step/2. of arange function 
 
-
     Doesn't prevent the case where there are more y max values (like in a costant y plot). 
     In this case only the first occurrence is returned
     """
     a_index = np.where((x >= a - tol) & (x <= a + tol))[0][0]
     b_index = np.where((x >= b - tol) & (x <= b + tol))[0][0]
     index = np.argmax(y[a_index:b_index+1])     # this is the index of the sliced y, not of the original y array
-    return x[a_index+index], y[a_index+index]   # so we need to add it to the index of the initial value a
+    index = a_index + index                     # so we need to add it to the index of the initial value a
+    return index, x[index], y[index]    # so we need to add it to the index of the initial value a
 
 def find_local_min_xy(x: np.array, y:np.array, a:float, b:float, tol:float) -> tuple:
     """
-    Find the local min y value of and x,y plot and the associated x, corresponding to limits: x==a and x==b 
+    Find the local min y value of and x,y plot and the associated x, corresponding to limits: x==a and x==b.
+    Returns index, x(index), y(index) 
 
     x must be an np.array and should be an ordinated values array, like np.arange and np.linspace
 
     a: the initial value of x, not the corresponding index -> y[a_index : ]
     b: the final value of x, not the corresponding index
-
 
     Doesn't prevent the case where there are more y min values (like in a costant y plot). 
     In this case only the first occurrence is returned
@@ -81,4 +82,6 @@ def find_local_min_xy(x: np.array, y:np.array, a:float, b:float, tol:float) -> t
     a_index = np.where((x >= a - tol) & (x <= a + tol))[0][0]
     b_index = np.where((x >= b - tol) & (x <= b + tol))[0][0]
     index = np.argmin(y[a_index:b_index+1])     # this is the index of the sliced y, not of the original y array
-    return x[a_index+index], y[a_index+index]   # so we need to add it to the index of the initial value a
+    index = a_index + index                     # so we need to add it to the index of the initial value a
+    return index, x[index], y[index]  
+
