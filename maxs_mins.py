@@ -1,4 +1,3 @@
-from msilib.schema import Error
 import numpy as np
 
 def find_max_xy_all(x: list, y:list) -> list[tuple]:
@@ -94,7 +93,7 @@ def list_of_max_indexes(x: np.array, y:np.array, list_of_points: list, tol:float
     # Maximum at supports:
     list_of_indexes_supports = [find_local_max_xy(x, y, list_of_points[i] , list_of_points[i], tol=tol)[0] for i in range(len(list_of_points)-1)]
     list_of_indexes_supports[-1] = list_of_indexes_supports[-1] -1  # last index corrisponds of total lenght in arange, but it's out of boundary for x and y 
-    # Maximum in the middle of spans: (len -2 beacuse lists are n+1)
+    # Maximum in the middle of spans: (len -2 because lists are n+1)
     list_of_indexes_spans = [find_local_max_xy(x, y, list_of_points[i] , list_of_points[i+1], tol=tol)[0] for i in range(0,len(list_of_points)-2)]
 
     list_of_indexes_all = list_of_indexes_supports + list_of_indexes_spans 
@@ -113,7 +112,7 @@ def list_of_min_indexes(x: np.array, y:np.array, list_of_points: list, tol:float
     list_of_indexes_supports = [find_local_min_xy(x, y, list_of_points[i] , list_of_points[i], tol=tol)[0] for i in range(len(list_of_points)-1)]
     list_of_indexes_supports[-1] = list_of_indexes_supports[-1] -1  # last index corrisponds of total lenght in arange, but it's out of boundary for x and y 
 
-    # Minimum in the middle of spans: (len -2 beacuse lists are n+1)
+    # Minimum in the middle of spans: (len -2 because lists are n+1)
     list_of_indexes_spans = [find_local_min_xy(x, y, list_of_points[i] , list_of_points[i+1], tol=tol)[0] for i in range(0,len(list_of_points)-2)]
 
     list_of_indexes_all = list_of_indexes_supports + list_of_indexes_spans 
