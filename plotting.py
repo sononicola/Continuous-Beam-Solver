@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-plt.rcParams['text.usetex'] = True
+#plt.rcParams['text.usetex'] = True
 class Plot:
     def my_plot_style(list_of_y_points:list[list] or list, title, x_thicks:list, y_label:str):
         """This is just a style definitions for plot methods. 

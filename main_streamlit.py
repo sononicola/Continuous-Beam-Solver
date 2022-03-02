@@ -17,7 +17,8 @@ st.set_page_config(
 # -- SIDEBAR --
 
 # -- PAGE CONTENT --
-st.title("Continuous beam solver")
+st.title("Continuous beam solver - beta")
+st.error("At the moment there is an error on table results when right support is a simple support. They have to be zero but there is a problem with indexes.... fixing ")
 st.warning("💡 With lenght in meters and EJ in kN/m2, then M will be in .. and V in ..")
 
 supports_list = ["Simple", "Fixed"] # ["Free", "Simple", "Fixed"] 
