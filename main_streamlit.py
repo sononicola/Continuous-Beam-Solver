@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from solver import Span, Beam, Solver, BendingMoment
 from tables import Table
 import pandas as pd
+plt.rcParams['text.usetex'] = True
 
 
 # -- GENERAL PAGE SETUP --
