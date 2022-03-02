@@ -1,6 +1,6 @@
 import pandas as pd
 
-from utils import find_local_max_xy, find_local_min_xy
+from maxs_mins import list_of_max_indexes, list_of_min_indexes
 import numpy as np
 
 class Table:
@@ -26,51 +26,7 @@ class Table:
 
         return header
 
-# TODO at the moment is strongly dependent from the two classes m and v:
-    def make_principal_row(x: np.array, y:np.array, cum_lenghts:list):
-        """Principal row is M or V and then associated row is V or M"""
-        p_row = []
-        DX = 0.
-        s = [find_local_max_xy(x, y, cum_lenghts[i] , cum_lenghts[i+1], tol=0.001)[1] for i in range(0,4)]
-        i = 0
-        #s = find_local_max_xy(x, y, cum_lenghts[i] + DX , cum_lenghts[i+1] + DX)
-        return s
-
-    def list_of_max_indexes(x: np.array, y:np.array, list_of_points: list, tol:float) -> list:
-
-        # Due to find_local_max_xy's tollerance value, we need to extend the lists because the last boundary exit from x list when checking np.where(b+tol)
-        list_of_points = np.append(list_of_points, list_of_points[-1] + tol)
-        x = np.append(x, x[-1] + tol)
-        y = np.append(y, y[-1])
-
-        # Maximum at supports:
-        list_of_indexes_supports = [find_local_max_xy(x, y, list_of_points[i] , list_of_points[i], tol=tol)[0] for i in range(len(list_of_points)-1)]
-
-        # Maximum in the middle of spans: (len -2 beacuse lists are n+1)
-        list_of_indexes_spans = [find_local_max_xy(x, y, list_of_points[i] , list_of_points[i+1], tol=tol)[0] for i in range(0,len(list_of_points)-2)]
-
-        list_of_indexes_all = list_of_indexes_supports + list_of_indexes_spans 
-        list_of_indexes_all.sort()
-
-        return list_of_indexes_all
-
-    def list_of_min_indexes(x: np.array, y:np.array, list_of_points: list, tol:float) -> list:
-
-        # Due to find_local_min_xy's tollerance value, we need to extend the lists because the last boundary exit from x list when checking np.where(b+tol)
-        list_of_points = np.append(list_of_points, list_of_points[-1] + tol)
-        x = np.append(x, x[-1] + tol)
-        y = np.append(y, y[-1])
-
-        # Minimum at supports:
-        list_of_indexes_supports = [find_local_max_xy(x, y, list_of_points[i] , list_of_points[i], tol=tol)[0] for i in range(len(list_of_points)-1)]
-
-        # Minimum in the middle of spans: (len -2 beacuse lists are n+1)
-        list_of_indexes_spans = [find_local_min_xy(x, y, list_of_points[i] , list_of_points[i+1], tol=tol)[0] for i in range(0,len(list_of_points)-2)]
-
-        list_of_indexes_all = list_of_indexes_supports + list_of_indexes_spans 
-        list_of_indexes_all.sort()
-
-        return list_of_indexes_all
+    
 
 
 # riga con la posizione dei valori
@@ -84,4 +40,5 @@ df = Table.create_datafrate(
     index = ["s", "m_pos","m_neg"]
 )
 #print(df)
+
 

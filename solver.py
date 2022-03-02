@@ -3,7 +3,7 @@ import sympy as sp
 import matplotlib.pyplot as plt
 
 from plotting import Plot
-from utils import *
+from maxs_mins import *
 
 from tables import Table
 class Span:
@@ -489,10 +489,6 @@ def run(beam: Beam):
     #M.plot_beam_Q_1()
     #M.plot_inviluppo()
 
-    print(find_local_max_xy(M.s_func, M.inviluppo()[0], 5., 26., tol=0.001/2))
-    
-    print(np.where((M.s_func == trave.spans_cum_lenght()[6])))
-    print(np.where((M.s_func >= trave.spans_cum_lenght()[6] - 0.001/2) & (M.s_func <= trave.spans_cum_lenght()[6] + 0.001/2)))
     
 
     #fig, ax = plt.subplots(1,1, figsize = (10, 5), tight_layout=True)
@@ -500,17 +496,20 @@ def run(beam: Beam):
     #ax.fill_between(M.s_func, M.inviluppo()[0], color='r')
     #ax.fill_between(M.s_func, M.inviluppo()[1], color='b')
     #ax.axhline(0, color='grey', linewidth=2)
-    
     #plt.show()
 
-    #x_row = Table.make_principal_row(x = M.s_func, y = M.inviluppo()[0],  cum_lenghts = trave.spans_cum_lenght())
-    #print(x_row)
+    # coordinates of inviluppo plot
+    cords_x = M.s_func
+    cords_y_pos, cords_y_neg = M.inviluppo()
 
-
-    print(find_local_max_xy(M.s_func, M.inviluppo()[0], trave.spans_cum_lenght()[0], trave.spans_cum_lenght()[0], tol=0.001/2))
-    maxs = Table.list_of_max_indexes(x = M.s_func, y = M.inviluppo()[0], list_of_points = trave.spans_cum_lenght(), tol=0.001/2)
+    maxs = Table.list_of_max_indexes(x = cords_x, y = cords_y_pos, list_of_points = trave.spans_cum_lenght(), tol=0.001/2)
     print(maxs)
-    print(Table.list_of_min_indexes(x = M.s_func, y = M.inviluppo()[1], list_of_points = trave.spans_cum_lenght(), tol=0.001/2))
-    print([M.s_func[i] for i in maxs[:-1]])
+    mins= Table.list_of_min_indexes(x = cords_x, y = cords_y_neg, list_of_points = trave.spans_cum_lenght(), tol=0.001/2)
+    print(mins)
+    print([cords_x[index] for index in maxs])
+    print([cords_y_pos[index] for index in maxs])
+    print([cords_y_neg[index] for index in maxs])
+    print([cords_x[index] for index in mins])
+    print([cords_y_neg[index] for index in mins])
 
 run(trave)
