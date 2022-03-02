@@ -408,6 +408,8 @@ class BendingMoment:
                     x_thicks = self.beam.spans_cum_lenght(), #aggiungere qui gli altri punti
                     y_label = r"$M$", 
                     color = "r" )
+        plt.show()
+        plt.close()
         return  fig
 
     def plot_beam_Q_1(self):
@@ -419,6 +421,8 @@ class BendingMoment:
                     x_thicks = self.beam.spans_cum_lenght(), 
                     y_label = r"$M$", 
                     color = "r" )
+        plt.show()
+        plt.close()
         return  fig
     
     def plot_span_Q_1(self, span_Q:int):
@@ -430,6 +434,8 @@ class BendingMoment:
                     x_thicks = self.beam.spans_cum_lenght(), 
                     y_label = r"$M$", 
                     color = "r" )
+        plt.show()
+        plt.close()
         return  fig
 
 
