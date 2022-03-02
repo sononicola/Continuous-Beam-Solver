@@ -3,7 +3,6 @@ import sympy as sp
 import matplotlib.pyplot as plt
 
 from plotting import Plot
-from maxs_mins import *
 
 from tables import Table
 class Span:
@@ -409,8 +408,6 @@ class BendingMoment:
                     x_thicks = self.beam.spans_cum_lenght(), #aggiungere qui gli altri punti
                     y_label = r"$M$", 
                     color = "r" )
-        plt.show()
-        plt.close()
         return  fig
 
     def plot_beam_Q_1(self):
@@ -422,8 +419,6 @@ class BendingMoment:
                     x_thicks = self.beam.spans_cum_lenght(), 
                     y_label = r"$M$", 
                     color = "r" )
-        plt.show()
-        plt.close()
         return  fig
     
     def plot_span_Q_1(self, span_Q:int):
@@ -435,8 +430,6 @@ class BendingMoment:
                     x_thicks = self.beam.spans_cum_lenght(), 
                     y_label = r"$M$", 
                     color = "r" )
-        plt.show()
-        plt.close()
         return  fig
 
 
@@ -461,7 +454,7 @@ c_4 = Span(lenght = 5.00, ej = EJ, q_max=LOAD_S_B, q_min=LOAD_F_B)
 c_5 = Span(lenght = 6.15, ej = EJ, q_max=LOAD_S_C, q_min=LOAD_F_C)
 c_6 = Span(lenght = 4.00, ej = EJ, q_max=LOAD_S_C, q_min=LOAD_F_C)
 
-trave = Beam(spans = [c_1, c_2, c_3, c_4, c_5, c_6], left_support="Simple", right_support="Fixed")
+trave = Beam(spans = [c_1, c_2, c_3, c_4, c_5, c_6], left_support="Simple", right_support="Simple")
 
 
 
@@ -488,6 +481,7 @@ def run(beam: Beam):
     #M.plot_span_Q_1(0)
     #M.plot_beam_Q_1()
     #M.plot_inviluppo()
+    #plt.show()
 
     
 
@@ -502,12 +496,12 @@ def run(beam: Beam):
     cords_x = M.s_func
     cords_y_pos, cords_y_neg = M.inviluppo()
 
-    df = Table.create_datafrate(
+    df_results_M = Table.create_datafrate(
         header=Table.make_header(len(trave.spans)),
-        rows = Table.make_body(cords_x, cords_y_pos, cords_y_neg,trave.spans_cum_lenght() ),
+        rows = Table.make_body(cords_x, cords_y_pos, cords_y_neg,trave.spans_cum_lenght(), tol=0.001/2 ),
         index = ["s", "m_pos","m_neg"]
     )  
-    print(df)
+    print(df_results_M)
 
 run(trave)
 

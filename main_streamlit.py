@@ -3,6 +3,8 @@ import numpy as np
 import sympy as sp
 import matplotlib.pyplot as plt
 from solver import Span, Beam, Solver, BendingMoment
+from tables import Table
+import pandas as pd
 
 
 # -- GENERAL PAGE SETUP --
@@ -41,7 +43,6 @@ with a3:
             index= 1,
             key = "right_support"            
     ) 
-
 
 # Every column creates a list 
 c1, c2, c3, c4 = st.columns(4)
@@ -96,7 +97,6 @@ with c4:
             )
         for i in range(1,nSpan+1)
         ]
-
 # -- INIT OBJECTS --
 
 # List of Span objects created starting from each list taken above:
@@ -109,33 +109,49 @@ beam  = Beam(spans=spans, left_support=left_support, right_support=right_support
 # beam.add_list_of_spans(spans)
 
 # -- RESULTS --
-
-st.write(f"{beam.spans_lenght() = }")
-st.write(f"{beam.spans_total_lenght() = }")
-st.write(f"{beam.spans_cum_lenght() = }")
-st.write(f"{beam.spans_ej() = }")
-st.write(f"{beam.spans_q_max() = }")
-st.write(f"{beam.spans_q_min() = }")
-
-sol = Solver(beam)
-x = sol.generate_expanded_x_solutions()
-r = sol.generate_R_solutions(x)
-
-st.write(f"{sol.generate_Flex_matrix() = }")
-st.write(f"{x = }")
-st.write(f"{r = }")
-
-M = BendingMoment(beam, x, r)
+df_inputs = pd.DataFrame(
+        columns=[f"C{i}" for i in range(1,nSpan+1)],
+        data = [
+            beam.spans_lenght(),
+            beam.spans_ej(),
+            beam.spans_q_max(),
+            beam.spans_q_min()
+        ],
+        index = ["Lenghts", "EJs","Q_Maxs","Q_Mins"]
+    )  
+st.table(df_inputs)
+run_button = st.button("Run 🏗")
 
 
-st.latex(f"Flex = {sp.latex(sol.generate_Flex_matrix())}")
-st.latex(r"\textup{Flex} = " + sp.latex(sol.generate_Flex_matrix()))
-st.latex(sp.latex(sol.generate_Flex_matrix()) + r"\cdot \vec{X} = " + sp.latex(sol.generate_P_vector_Q()))
-st.latex(f"X = {sp.latex(sol.generate_expanded_x_solutions())}")
-st.latex(f"R = {sp.latex(sol.generate_R_solutions(x))}")
+def run(beam: Beam):
+    sol = Solver(beam)
+    x = sol.generate_expanded_x_solutions()
+    r = sol.generate_R_solutions(x)
+    st.latex(r"\textup{Flex} = " + sp.latex(sol.generate_Flex_matrix()))
+    st.latex(r"\textup{P} = " + sp.latex(sol.generate_P_vector_Q()))
+    st.latex(sp.latex(sol.generate_Flex_matrix()) + r"\cdot \vec{X} = " + sp.latex(sol.generate_P_vector_Q()))
+    st.latex(r"\hookrightarrow \textup{X} = " + sp.latex(x))
+    st.latex(r"\hookrightarrow \textup{R} = " + sp.latex(r))
 
-with st.expander("👉 Click to see plots where Q = 1 is applied in each span"):
-    for span in range(len(beam.spans)):
-        st.pyplot(M.plot_span_Q_1(span))
-st.pyplot(M.plot_beam_Q_1())
-st.pyplot(M.plot_inviluppo())
+    M = BendingMoment(beam, x, r)
+
+    # coordinates of inviluppo plot
+    cords_x = M.s_func
+    cords_y_pos, cords_y_neg = M.inviluppo()
+
+    with st.expander("👉 Click to see plots where Q = 1 is applied in each span"):
+        for span in range(len(beam.spans)):
+            st.pyplot(M.plot_span_Q_1(span))
+        st.pyplot(M.plot_beam_Q_1())
+
+    st.pyplot(M.plot_inviluppo())
+
+    df_results_M = Table.create_datafrate(
+        header=Table.make_header(len(beam.spans)),
+        rows = Table.make_body(cords_x, cords_y_pos, cords_y_neg,beam.spans_cum_lenght(), tol=0.001/2),
+        index = ["s", "m_pos","m_neg"]
+    )  
+    st.table(df_results_M)
+
+if run_button:
+    run(beam=beam)
