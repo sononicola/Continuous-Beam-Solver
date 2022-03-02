@@ -26,7 +26,15 @@ class Table:
 
         return header
 
-    
+    def make_body(cords_x, cords_y_pos, cords_y_neg, list_of_points) -> list[list]:
+        maxs = list_of_max_indexes(x = cords_x, y = cords_y_pos, list_of_points = list_of_points, tol=0.001/2)
+        mins = list_of_min_indexes(x = cords_x, y = cords_y_neg, list_of_points = list_of_points, tol=0.001/2)
+        body_table = [
+                        [cords_x[index] for index in maxs], 
+                        [cords_y_pos[index] for index in maxs],
+                        [cords_y_neg[index] for index in maxs]
+                    ]
+        return body_table
 
 
 # riga con la posizione dei valori
@@ -34,11 +42,7 @@ class Table:
     def create_datafrate(header:list, rows:list[list], index:list):
         return pd.DataFrame(rows, columns=header, index=index)
 
-df = Table.create_datafrate(
-    header=Table.make_header(3),
-    rows = [[1,2,3,4,5,6,7],[10,2,3,4,5,6,7],[1022,23,3,4,5,6,7]],
-    index = ["s", "m_pos","m_neg"]
-)
+
 #print(df)
 
 

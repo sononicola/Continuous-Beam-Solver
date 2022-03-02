@@ -502,14 +502,12 @@ def run(beam: Beam):
     cords_x = M.s_func
     cords_y_pos, cords_y_neg = M.inviluppo()
 
-    maxs = Table.list_of_max_indexes(x = cords_x, y = cords_y_pos, list_of_points = trave.spans_cum_lenght(), tol=0.001/2)
-    print(maxs)
-    mins= Table.list_of_min_indexes(x = cords_x, y = cords_y_neg, list_of_points = trave.spans_cum_lenght(), tol=0.001/2)
-    print(mins)
-    print([cords_x[index] for index in maxs])
-    print([cords_y_pos[index] for index in maxs])
-    print([cords_y_neg[index] for index in maxs])
-    print([cords_x[index] for index in mins])
-    print([cords_y_neg[index] for index in mins])
+    df = Table.create_datafrate(
+        header=Table.make_header(len(trave.spans)),
+        rows = Table.make_body(cords_x, cords_y_pos, cords_y_neg,trave.spans_cum_lenght() ),
+        index = ["s", "m_pos","m_neg"]
+    )  
+    print(df)
 
 run(trave)
+
