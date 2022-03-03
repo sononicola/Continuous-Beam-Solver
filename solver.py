@@ -316,6 +316,7 @@ class BendingMoment:
         self.x = x
         self.r = r
         self.s_func = np.arange(0, beam.spans_total_lenght(), .001) # points on X axe
+        #self.s_func = np.linspace(0, beam.spans_total_lenght(), num=1000)
 
     def bending_moment_span_Q_1(self, span_Q : int): #TODO _1 _func
         """
@@ -342,7 +343,7 @@ class BendingMoment:
                 for n_span in range(nCampate)
             ]
         m_i_lambdify = sp.lambdify(s,np.sum(m_i,axis=0))
-        s_lambdify  = np.linspace(0, total_lenght, 1000)
+        #s_lambdify  = np.linspace(0, total_lenght, 1000)
     # ---- With numpy: TODO maybe. doesnt work as expected the heaviside func
         #s = np.linspace(0, total_lenght, 1000)
         #m_i = [
@@ -404,12 +405,10 @@ class BendingMoment:
         fig, ax = Plot.plot_list_of_y_points(
                     s_func = self.s_func, 
                     list_of_y_points = self.inviluppo(), 
-                    title =r"\bf{Inviluppo}",
+                    title =r"Inviluppo",
                     x_thicks = self.beam.spans_cum_lenght(), #aggiungere qui gli altri punti
                     y_label = r"M", 
                     color = "r" )
-        plt.show()
-        plt.close()
         return  fig
 
     def plot_beam_Q_1(self):
@@ -421,8 +420,6 @@ class BendingMoment:
                     x_thicks = self.beam.spans_cum_lenght(), 
                     y_label = r"M", 
                     color = "r" )
-        plt.show()
-        plt.close()
         return  fig
     
     def plot_span_Q_1(self, span_Q:int):
@@ -434,8 +431,6 @@ class BendingMoment:
                     x_thicks = self.beam.spans_cum_lenght(), 
                     y_label = r"M", 
                     color = "r" )
-        plt.show()
-        plt.close()
         return  fig
 
 
@@ -460,7 +455,7 @@ c_4 = Span(lenght = 5.00, ej = EJ, q_max=LOAD_S_B, q_min=LOAD_F_B)
 c_5 = Span(lenght = 6.15, ej = EJ, q_max=LOAD_S_C, q_min=LOAD_F_C)
 c_6 = Span(lenght = 4.00, ej = EJ, q_max=LOAD_S_C, q_min=LOAD_F_C)
 
-trave = Beam(spans = [c_1, c_2, c_3, c_4, c_5, c_6], left_support="Simple", right_support="Simple")
+trave = Beam(spans = [c_1, c_2, c_3, c_4, c_5, c_6], left_support="Simple", right_support="Fixed")
 
 
 
@@ -486,8 +481,9 @@ def run(beam: Beam):
     
     #M.plot_span_Q_1(0)
     #M.plot_beam_Q_1()
-    #M.plot_inviluppo()
-    #plt.show()
+    M.plot_inviluppo()
+    plt.show()
+    plt.close()
 
     
 
@@ -501,13 +497,24 @@ def run(beam: Beam):
     # coordinates of inviluppo plot
     cords_x = M.s_func
     cords_y_pos, cords_y_neg = M.inviluppo()
-
+    print(f"{cords_y_pos = }")
+    print(f"{cords_y_neg = }")
+    print(f"{cords_y_pos[-1] = }")
+    print(f"{cords_y_pos[0] = }")
+    print(f"{cords_y_pos[-2] = }")
+    print(f"{cords_y_pos[1] = }")
+    print(f"{cords_y_neg[-1] = }")
+    print(f"{cords_y_neg[0] = }")
+    print(f"{cords_y_neg[-2] = }")
+    print(f"{cords_y_neg[1] = }")
+    print(f"{cords_x[-1] = }")
+    print(f"{cords_x[0] = }")
+    print(len(cords_x))
     df_results_M = Table.create_datafrate(
         header=Table.make_header(len(trave.spans)),
         rows = Table.make_body(cords_x, cords_y_pos, cords_y_neg,trave.spans_cum_lenght(), tol=0.001/2 ),
         index = ["s", "m_pos","m_neg"]
     )  
     print(df_results_M)
-
-run(trave)
+#run(trave)
 
