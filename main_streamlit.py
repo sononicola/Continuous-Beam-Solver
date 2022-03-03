@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from solver import Span, Beam, Solver, BendingMoment
 from tables import Table
 import pandas as pd
-plt.rcParams['text.usetex'] = True
+
 
 
 # -- GENERAL PAGE SETUP --
@@ -154,6 +154,7 @@ def run(beam: Beam):
         index = ["s", "m_pos","m_neg"]
     )  
     st.table(df_results_M)
+    st.warning("If Bending Moment values aren't 0.0 when the support is Simple, it's a problem due to approximation!")
 
 if run_button:
     run(beam=beam)

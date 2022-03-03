@@ -18,7 +18,7 @@ class Plot:
         ax.set_xticks(x_thicks) #TODO aggiungere xthick nel massimo in mezzeria
         #ax.set_yticks(np.arange(-300, 250, step=50)) #TODO
         ax.set_title(title, fontsize=20)
-        ax.set_xlabel(r"$L$")
+        ax.set_xlabel(r"L")
         ax.set_ylabel(y_label) #TODO aggiungere l'if se si usa per il taglio
         return  fig, ax
 
@@ -66,8 +66,8 @@ class Plot:
             #ax.set_xticklabels(cum_lenghts) # per il nome campata magari
             ax.set_xticks(cum_lenghts) #TODO aggiungere xthick nel massimo in mezzeria
             #ax.set_yticks(np.arange(-300, 250, step=50)) #TODO
-            ax.set_xlabel(r"$L$")
-            ax.set_ylabel(r"$M$") #TODO aggiungere l'if se si usa per il taglio
+            ax.set_xlabel(r"L")
+            ax.set_ylabel(r"M") #TODO aggiungere l'if se si usa per il taglio
             
             plt.show()
             return fig #,ax

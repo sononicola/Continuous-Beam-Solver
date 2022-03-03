@@ -406,7 +406,7 @@ class BendingMoment:
                     list_of_y_points = self.inviluppo(), 
                     title =r"\bf{Inviluppo}",
                     x_thicks = self.beam.spans_cum_lenght(), #aggiungere qui gli altri punti
-                    y_label = r"$M$", 
+                    y_label = r"M", 
                     color = "r" )
         plt.show()
         plt.close()
@@ -419,7 +419,7 @@ class BendingMoment:
                     y_points = self.bending_moment_beam_Q_1(), 
                     title = "Carico unitario",
                     x_thicks = self.beam.spans_cum_lenght(), 
-                    y_label = r"$M$", 
+                    y_label = r"M", 
                     color = "r" )
         plt.show()
         plt.close()
@@ -432,7 +432,7 @@ class BendingMoment:
                     y_points = self.bending_moment_span_Q_1(span_Q)(self.s_func), 
                     title = f"Q = 1 only in span number {span_Q + 1}",
                     x_thicks = self.beam.spans_cum_lenght(), 
-                    y_label = r"$M$", 
+                    y_label = r"M", 
                     color = "r" )
         plt.show()
         plt.close()
