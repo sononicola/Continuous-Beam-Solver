@@ -5,6 +5,9 @@ import matplotlib.pyplot as plt
 from plotting import Plot
 
 from tables import Table
+
+from global_variables import *
+
 class Span:
     def __init__(self, lenght: float, ej: float, q_max: float = 0., q_min: float = 0.):
         self.lenght = lenght
@@ -334,7 +337,7 @@ class BendingMoment:
         self.nCampate =  len(beam.spans)
         self.x = x
         self.r = r
-        self.s_func = np.arange(0, beam.spans_total_lenght(), .001) # points on X axe
+        self.s_func = np.arange(0, beam.spans_total_lenght(), ARANGE_STEP) # points on X axe
         #self.s_func = np.linspace(0, beam.spans_total_lenght(), num=1000)
 
     def bending_moment_span_Q_1(self, span_Q : int): #TODO _1 _func
@@ -531,9 +534,11 @@ def run(beam: Beam):
     print(len(cords_x))
     df_results_M = Table.create_dataframe(
         header=Table.make_header(len(trave.spans)),
-        rows = Table.make_body(cords_x, cords_y_pos, cords_y_neg,trave.spans_cum_lenght(), tol=0.001/2 ),
+        rows = Table.make_body(cords_x, cords_y_pos, cords_y_neg,trave.spans_cum_lenght()),
         index = ["s", "m_pos","m_neg"]
     )  
     print(df_results_M)
+    print(cords_x)
+    print(len(cords_x))
 run(trave)
 

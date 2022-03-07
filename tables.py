@@ -2,6 +2,7 @@ import pandas as pd
 
 from maxs_mins import list_of_max_indexes, list_of_min_indexes
 import numpy as np
+from global_variables import *
 
 class Table:
     def make_header(n:int, string1:str = "A", string2:str = "C"):
@@ -26,9 +27,10 @@ class Table:
 
         return header
 
-    def make_body(cords_x, cords_y_pos, cords_y_neg, list_of_points, tol=0.001/2) -> list[list]:
-        indexes_maxs = list_of_max_indexes(x = cords_x, y = cords_y_pos, list_of_points = list_of_points, tol=tol)
-        indexes_mins = list_of_min_indexes(x = cords_x, y = cords_y_neg, list_of_points = list_of_points, tol=tol)
+    def make_body(cords_x, cords_y_pos, cords_y_neg, list_of_points) -> list[list]:
+        tol = ARANGE_STEP
+        indexes_maxs = list_of_max_indexes(x = cords_x, y = cords_y_pos, list_of_points = list_of_points)
+        indexes_mins = list_of_min_indexes(x = cords_x, y = cords_y_neg, list_of_points = list_of_points)
         s = [cords_x[index] for index in indexes_maxs]
         s[-1] = s[-1] + 2*tol # due to np.arange aproximation, last term was not equal to total_lenght
         
