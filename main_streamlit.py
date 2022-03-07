@@ -154,7 +154,7 @@ def run(beam: Beam):
     # table results for bending moment
     df_results_M = Table.create_dataframe(
         header=Table.make_header(len(beam.spans)),
-        rows = Table.make_body(cords_x, cords_y_pos, cords_y_neg,beam.spans_cum_lenght(), tol=ARANGE_STEP/2),
+        rows = Table.make_body(cords_x, cords_y_pos, cords_y_neg,beam.spans_cum_lenght()),
         index = ["s", "m_pos","m_neg"]
     )  
     st.table(df_results_M)
