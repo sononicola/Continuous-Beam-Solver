@@ -130,10 +130,10 @@ def run(beam: Beam):
     sol = Solver(beam)
     x = sol.generate_expanded_x_solutions()
     r = sol.generate_R_solutions(x)
-    st.latex(r"\textup{Flex} = " + sp.latex(sol.generate_Flex_matrix()))
-    st.latex(r"\textup{P} = " + sp.latex(sol.generate_P_vector_Q()))
-    st.latex(sp.latex(sol.generate_Flex_matrix()) + r"\cdot \vec{X} = " + sp.latex(sol.generate_P_vector_Q()))
-    st.latex(r"\hookrightarrow \textup{X} = " + sp.latex(x))
+    st.latex(r"\textup{Flex}_{generic} = " + sp.latex(sol.generate_Flex_matrix()))
+    st.latex(r"\textup{P}_{generic} = " + sp.latex(sol.generate_P_vector_Q()))
+    st.latex(sp.latex(sol.generate_reduced_Flex_matrix_and_P_vector()[0]) + r"\cdot \vec{X}_{rid} = " + sp.latex(sol.generate_reduced_Flex_matrix_and_P_vector()[1]))
+    st.latex(r"\hookrightarrow \textup{X}_{expanded} = " + sp.latex(x))
     st.latex(r"\hookrightarrow \textup{R} = " + sp.latex(r))
 
 # -- CALCULATING BENDING MOMENT --
