@@ -29,14 +29,11 @@ class Table:
     def make_body(cords_x, cords_y_pos, cords_y_neg, list_of_points, tol=0.001/2) -> list[list]:
         indexes_maxs = list_of_max_indexes(x = cords_x, y = cords_y_pos, list_of_points = list_of_points, tol=tol)
         indexes_mins = list_of_min_indexes(x = cords_x, y = cords_y_neg, list_of_points = list_of_points, tol=tol)
-        print(indexes_maxs)
-        print(indexes_mins)
         s = [cords_x[index] for index in indexes_maxs]
         s[-1] = s[-1] + 2*tol # due to np.arange aproximation, last term was not equal to total_lenght
         
         indexes_maxs[0] = 1 # for some reason cords_y_pos[0] and cords_y_neg[0] aren't correct, 
                             # so cords_y_pos[1] solves the problems
-
         body_table = [
                         s, 
                         [cords_y_pos[index] for index in indexes_maxs],
@@ -44,7 +41,7 @@ class Table:
                     ]
         return body_table
 
-    def create_datafrate(header:list, rows:list[list], index:list) -> pd.DataFrame:
+    def create_dataframe(header:list, rows:list[list], index:list) -> pd.DataFrame:
         return pd.DataFrame(columns=header, data=rows, index=index)
 
 

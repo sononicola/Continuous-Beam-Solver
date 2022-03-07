@@ -110,7 +110,6 @@ beam  = Beam(spans=spans, left_support=left_support, right_support=right_support
 # beam = Beam([], left_support=left_support, right_support=right_support)
 # beam.add_list_of_spans(spans)
 
-# -- RESULTS --
 df_inputs = pd.DataFrame(
         columns=[f"C{i}" for i in range(1,nSpan+1)],
         data = [
@@ -122,8 +121,9 @@ df_inputs = pd.DataFrame(
         index = ["Lenghts", "EJs","Q_Maxs","Q_Mins"]
     )  
 st.table(df_inputs)
-run_button = st.button("Run 🏗")
 
+# -- RUNNING PROGRAM --
+run_button = st.button("Run 🏗")
 
 def run(beam: Beam):
     sol = Solver(beam)
@@ -135,12 +135,14 @@ def run(beam: Beam):
     st.latex(r"\hookrightarrow \textup{X} = " + sp.latex(x))
     st.latex(r"\hookrightarrow \textup{R} = " + sp.latex(r))
 
+# -- CALCULATING BENDING MOMENT --
     M = BendingMoment(beam, x, r)
 
-    # coordinates of inviluppo plot
+    # storing x,y coordinates of inviluppo plot
     cords_x = M.s_func
     cords_y_pos, cords_y_neg = M.inviluppo()
 
+    # plotting 
     with st.expander("👉 Click to see plots where Q = 1 is applied in each span"):
         for span in range(len(beam.spans)):
             st.pyplot(M.plot_span_Q_1(span))
@@ -148,13 +150,18 @@ def run(beam: Beam):
 
     st.pyplot(M.plot_inviluppo())
 
-    df_results_M = Table.create_datafrate(
+    # table results for bending moment
+    df_results_M = Table.create_dataframe(
         header=Table.make_header(len(beam.spans)),
         rows = Table.make_body(cords_x, cords_y_pos, cords_y_neg,beam.spans_cum_lenght(), tol=0.001/2),
         index = ["s", "m_pos","m_neg"]
     )  
     st.table(df_results_M)
     st.warning("If Bending Moment values aren't 0.0 when the support is Simple, it's a problem due to approximation!")
+    
+    df_results_M_latex = df_results_M.style.to_latex(position='H', hrules=True, siunitx=True)
+    st.download_button("💾 Save results as a LaTeX table", data=df_results_M_latex, mime="text/latex",file_name="results_M_table.tex")
 
 if run_button:
     run(beam=beam)
+#mime del pdf: application/pdf
