@@ -85,23 +85,42 @@ class Beam:
         #q_min_list = ["F1", "F2", "F3", "F4", "F5", "F6"]
         #nCampate = 6        
         
+        # S S S S S S ...
+        comb_0 = q_max_list
         # S F S F S F ...
         comb_1 = [q_max_list[i] if i%2 == 0 else q_min_list[i] for i in range(nCampate)]
         # F S F S F S...
         comb_2 = [q_max_list[i] if i%2 == 1 else q_min_list[i] for i in range(nCampate)]
-        # S S F S F S...
-        comb_3 = [q_max_list[0]]
-        comb_3.extend([q_max_list[i] if i%2 == 1 else q_min_list[i] for i in range(1,nCampate)])
 
-        comb_3 = [q_max_list[i] if i%2 == 1 else q_min_list[i] for i in range(nCampate)]
-        comb_3[0] = q_max_list[0]
+        """
+        S S F S F S...
+        F S S F S F...
+        S F S S F S...
 
+        comb_j is a couple of [ S[j] , S[j+1] ] at j index. Then is added the left side and the right side to it. 
+        if j = 1: ['F1', 'S2', 'S3', 'F4', 'S5', 'F6']
+        if j = 2: ['S1', 'F2', 'S3', 'S4', 'F5', 'S6']
+        """
+        combs_SS: list[list] = []
+        
+        for j in range(0,nCampate-1): 
+            comb_j = [q_max_list[j] , q_max_list[j+1]] 
+            if j%2 == 0:
+                comb_right = [q_max_list[i] if i%2 == 1 else q_min_list[i] for i in range(j+2,nCampate)]
+                comb_left = [q_max_list[i] if i%2 == 0 else q_min_list[i] for i in range(0,j)]
+            else:
+                comb_right = [q_max_list[i] if i%2 == 0 else q_min_list[i] for i in range(j+2,nCampate)]
+                comb_left = [q_max_list[i] if i%2 == 1 else q_min_list[i] for i in range(0,j)]
 
+            comb_left.extend(comb_j)
+            comb_left.extend(comb_right)
+            combs_SS.append(comb_left)
 
-        #print(comb_1)
-        #print(comb_2)
-        #print(comb_3)
-        return [comb_1,comb_2]
+        # Add all combinations in a list of lists:
+        combs: list[list] = [comb_0, comb_1, comb_2]
+        combs.extend(combs_SS)
+
+        return combs
 
     # --- REAL SOLVING METHODS: ---
     # Using sympy:  symbolic -> reduced with BC -> subsituted with numeric values ->  solved the system ->  expanded to initial lenghts row, columns
@@ -510,11 +529,11 @@ def run(beam: Beam):
     print(f"{cords_x[-1] = }")
     print(f"{cords_x[0] = }")
     print(len(cords_x))
-    df_results_M = Table.create_datafrate(
+    df_results_M = Table.create_dataframe(
         header=Table.make_header(len(trave.spans)),
         rows = Table.make_body(cords_x, cords_y_pos, cords_y_neg,trave.spans_cum_lenght(), tol=0.001/2 ),
         index = ["s", "m_pos","m_neg"]
     )  
     print(df_results_M)
-#run(trave)
+run(trave)
 
