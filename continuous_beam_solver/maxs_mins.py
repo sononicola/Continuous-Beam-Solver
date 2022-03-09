@@ -1,5 +1,5 @@
 import numpy as np
-from solver.global_variables import *
+from continuous_beam_solver.global_variables import *
 
 def find_max_xy_all(x: list, y:list) -> list[tuple]:
     """

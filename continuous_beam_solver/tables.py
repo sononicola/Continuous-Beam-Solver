@@ -1,8 +1,8 @@
 import pandas as pd
 
-from solver.maxs_mins import list_of_max_indexes, list_of_min_indexes
+from continuous_beam_solver.maxs_mins import list_of_max_indexes, list_of_min_indexes
 import numpy as np
-from solver.global_variables import *
+from continuous_beam_solver.global_variables import *
 
 class Table:
     def make_header(n:int, string1:str = "A", string2:str = "C"):

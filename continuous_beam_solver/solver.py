@@ -2,11 +2,11 @@ import numpy as np
 import sympy as sp
 import matplotlib.pyplot as plt
 
-from solver.plotting import Plot
+from continuous_beam_solver.plotting import Plot
 
-from solver.tables import Table
+from continuous_beam_solver.tables import Table
 
-from solver.global_variables import *
+from continuous_beam_solver.global_variables import *
 
 class Span:
     def __init__(self, lenght: float, ej: float, q_max: float = 0., q_min: float = 0.):
