@@ -1,5 +1,5 @@
 import numpy as np
-from global_variables import *
+from solver.global_variables import *
 
 def find_max_xy_all(x: list, y:list) -> list[tuple]:
     """

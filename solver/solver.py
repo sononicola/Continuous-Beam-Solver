@@ -2,11 +2,11 @@ import numpy as np
 import sympy as sp
 import matplotlib.pyplot as plt
 
-from plotting import Plot
+from solver.plotting import Plot
 
-from tables import Table
+from solver.tables import Table
 
-from global_variables import *
+from solver.global_variables import *
 
 class Span:
     def __init__(self, lenght: float, ej: float, q_max: float = 0., q_min: float = 0.):
