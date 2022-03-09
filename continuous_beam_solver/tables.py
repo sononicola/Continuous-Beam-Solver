@@ -1,7 +1,6 @@
 import pandas as pd
 
 from continuous_beam_solver.maxs_mins import list_of_max_indexes, list_of_min_indexes
-import numpy as np
 from continuous_beam_solver.global_variables import *
 
 class Table:

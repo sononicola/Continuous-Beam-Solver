@@ -1,11 +1,14 @@
 import streamlit as st
+from continuous_beam_solver.solver import Solver
+from continuous_beam_solver.span_beam import Span, Beam
+from continuous_beam_solver.internal_forces import BendingMoment
+from continuous_beam_solver.tables import Table
+from continuous_beam_solver.global_variables import *
+
 import numpy as np
 import sympy as sp
 import matplotlib.pyplot as plt
-from solver import Span, Beam, Solver, BendingMoment
-from tables import Table
 import pandas as pd
-from global_variables import *
 
 
 
