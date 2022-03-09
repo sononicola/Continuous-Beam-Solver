@@ -1,6 +1,6 @@
 from continuous_beam_solver.solver import Solver
 from continuous_beam_solver.span_beam import Span, Beam
-from continuous_beam_solver.internal_forces import BendingMoment
+from continuous_beam_solver.internal_forces import BendingMoment, Shear
 from continuous_beam_solver.tables import Table
 from continuous_beam_solver.global_variables import *
 
@@ -38,6 +38,7 @@ def run(beam: Beam):
     #print(f"R = {r}")
 
     M = BendingMoment(beam, x, r)
+    V = Shear(beam, x, r)
     
     #M.plot_span_Q_1(0)
     #M.plot_beam_Q_1()
@@ -78,7 +79,6 @@ def run(beam: Beam):
     print(df_results_M)
     print(cords_x)
     print(len(cords_x))
-
 
 if __name__ == "__main__":
     run(trave)

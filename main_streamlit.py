@@ -1,7 +1,7 @@
 import streamlit as st
 from continuous_beam_solver.solver import Solver
 from continuous_beam_solver.span_beam import Span, Beam
-from continuous_beam_solver.internal_forces import BendingMoment
+from continuous_beam_solver.internal_forces import BendingMoment, Shear
 from continuous_beam_solver.tables import Table
 from continuous_beam_solver.global_variables import *
 
