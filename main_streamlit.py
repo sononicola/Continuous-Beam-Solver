@@ -10,7 +10,7 @@ import sympy as sp
 import matplotlib.pyplot as plt
 import pandas as pd
 
-plt.style.use('seaborn-whitegrid')
+
 # -- GENERAL PAGE SETUP --
 st.set_page_config(
      page_title = "Continuous beam solver",
@@ -140,30 +140,57 @@ def run(beam: Beam):
 
 # -- CALCULATING BENDING MOMENT --
     M = BendingMoment(beam, x, r)
+    V = Shear(beam, x, r)
 
     # storing x,y coordinates of inviluppo plot
-    cords_x = M.s_func
-    cords_y_pos, cords_y_neg = M.inviluppo()
+    M_cords_x = M.s_func
+    M_cords_y_pos, M_cords_y_neg = M.inviluppo()
 
-    # plotting 
+    V_cords_x = V.s_func
+    V_cords_y_pos, V_cords_y_neg = V.inviluppo()
+
+# PLOTTING 
+    # BENDING MOMENT
+    st.pyplot(M.plot_inviluppo())
+
     with st.expander("👉 Click to see plots where Q = 1 is applied in each span"):
+        st.write("Bending Moment")
         for span in range(len(beam.spans)):
             st.pyplot(M.plot_span_Q_1(span))
         st.pyplot(M.plot_beam_Q_1())
 
-    st.pyplot(M.plot_inviluppo())
-
     # table results for bending moment
-    df_results_M = Table.create_dataframe(
+    M_df_results = Table.create_dataframe(
         header=Table.make_header(len(beam.spans)),
-        rows = Table.make_body(cords_x, cords_y_pos, cords_y_neg,beam.spans_cum_lenght()),
-        index = ["s", "m_pos","m_neg"]
+        rows = Table.make_body(M_cords_x, M_cords_y_pos, M_cords_y_neg,beam.spans_cum_lenght()),
+        index = ["s", "M_pos","M_neg"]
     )  
-    st.table(df_results_M)
+    st.table(M_df_results)
     st.warning("If Bending Moment values aren't 0.0 when the support is Simple, it's a problem due to approximation!")
     
-    df_results_M_latex = df_results_M.style.to_latex(position='H', hrules=True, siunitx=True)
+    df_results_M_latex = M_df_results.style.to_latex(position='H', hrules=True, siunitx=True)
     st.download_button("💾 Save results as a LaTeX table", data=df_results_M_latex, mime="text/latex",file_name="results_M_table.tex")
+
+    # SHEAR
+    st.pyplot(V.plot_inviluppo())
+
+    with st.expander("👉 Click to see plots where Q = 1 is applied in each span"):
+        st.write("Bending Voment")
+        for span in range(len(beam.spans)):
+            st.pyplot(V.plot_span_Q_1(span))
+        st.pyplot(V.plot_beam_Q_1())
+
+    # table results for bending moment
+    V_df_results = Table.create_dataframe(
+        header=Table.make_header(len(beam.spans)),
+        rows = Table.make_body(V_cords_x, V_cords_y_pos, V_cords_y_neg,beam.spans_cum_lenght()),
+        index = ["s", "V_pos","V_neg"]
+    )  
+    st.table(V_df_results)
+    st.warning("If Shear values aren't")
+    
+    df_results_V_latex = V_df_results.style.to_latex(position='H', hrules=True, siunitx=True)
+    st.download_button("💾 Save results as a LaTeX table", data=df_results_V_latex, mime="text/latex",file_name="results_V_table.tex")
 
 if run_button:
     run(beam=beam)

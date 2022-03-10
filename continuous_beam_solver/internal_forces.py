@@ -99,7 +99,7 @@ class BendingMoment(InternalForce):
     def __init__(self,beam:Beam, x:list[sp.Matrix], r:list[sp.Matrix]):
         super().__init__(beam, x, r)
 
-    def calculate_internal_force_span_Q_1(self, span_Q : int): #TODO _1 _func
+    def calculate_internal_force_span_Q_1(self, span_Q : int) -> sp.lambdify : #TODO _1 _func
         """
         Compute the bending moment lamdified function for a "span_Q", 
         which is the span where the distribuited load Q is applied and the others Q is zero
@@ -143,7 +143,7 @@ class Shear(InternalForce):
     def __init__(self,beam:Beam, x:list[sp.Matrix], r:list[sp.Matrix]):
         super().__init__(beam, x, r)
 
-    def calculate_internal_force_span_Q_1(self, span_Q : int): #TODO _1 _func
+    def calculate_internal_force_span_Q_1(self, span_Q : int) -> sp.lambdify : 
         """
         Compute the shear lamdified function for a "span_Q", 
         which is the span where the distribuited load Q is applied and the others Q is zero
@@ -162,24 +162,25 @@ class Shear(InternalForce):
         #n_span = 0
     # ---- With Sympy:
         s = sp.Symbol('s')
-        m_i = [
-                    ((x[span_Q][n_span] + r[span_Q][n_span] * (s-cum_lenghts[n_span])) - ((I[span_Q,n_span]*(s-cum_lenghts[span_Q])**2)/2)) \
+        v_i = [
+                    (r[span_Q][n_span]  - (I[span_Q,n_span]*(s-cum_lenghts[span_Q]))) \
                     * (sp.Heaviside(s-cum_lenghts[n_span]) - sp.Heaviside(s-cum_lenghts[n_span+1])) \
                 for n_span in range(nCampate)
             ]
-        m_i_lambdify = sp.lambdify(s,np.sum(m_i,axis=0))
-        #s_lambdify  = np.linspace(0, total_lenght, 1000)
-    # ---- With numpy: TODO maybe. doesnt work as expected the heaviside func
-        #s = np.linspace(0, total_lenght, 1000)
-        #m_i = [
-        #           ((x[span_Q][n_span] + r[span_Q][n_span] * (s-cum_lenghts[n_span])) - ((I[span_Q,n_span]*(s-cum_lenghts[span_Q])**2)/2)) \
-        #            * (np.heaviside(s-cum_lenghts[n_span],0) - np.heaviside(s-cum_lenghts[n_span+1],0)) \
-        #        for n_span in range(nCampate)
-        #    ]
-        
-        # m_i is a list of list. We want to sum each list inside, not the total of everything: so we need "axis=0"
-        # Example from numpy documentation: np.sum([[0, 1], [0, 5]], axis=0) >>> array([0, 6])
-        #return np.sum(m_i,axis=0) 
+        v_i_lambdify = sp.lambdify(s,np.sum(v_i,axis=0))
+    # ---- With numpy: 
+        # Not tried. See the BendingMoment Class instead
 
-        return m_i_lambdify #TODO m_span_Q_1
+        return v_i_lambdify #TODO m_span_Q_1
 
+    def plot_inviluppo(self):
+        """Plot the inviluppo() using Plot.my_plot_style"""
+        fig, ax = Plot.plot_list_of_y_points(
+                    s_func = self.s_func, 
+                    list_of_y_points = self.inviluppo(), 
+                    title =r"Inviluppo",
+                    x_thicks = self.beam.spans_cum_lenght(), #aggiungere qui gli altri punti
+                    y_label = r"V", 
+                    color = "r" )
+        ax.invert_yaxis()
+        return  fig
