@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+
 plt.style.use('science')
 plt.rcParams['text.usetex'] = False
 
@@ -21,6 +22,8 @@ class Plot:
         #ax.set_yticks(np.arange(-300, 250, step=50)) #TODO
         ax.tick_params(axis='both', labelsize=12)
         ax.set_title(title, fontsize=18)
+        ax.set_xlabel("Loaaaaadddsoo", fontsize=14)
+        ax.set_ylabel(y_label, fontsize=14) #TODO aggiungere l'if se si usa per il taglio
         return  fig, ax
 
     def plot_y_points(s_func:list, y_points:list, title:str, x_thicks:list, y_label:str, color:str):
