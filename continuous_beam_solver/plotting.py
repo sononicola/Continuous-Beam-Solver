@@ -41,33 +41,3 @@ class Plot:
         
         return  fig, ax
 
-# TODO cancelare una volta finito il my_plot_style:
-    def plot_bending_moment_beam_Q(self, list_of_xy_points): #TODO trasformarlo in un plot generico e metterlo in una sua classe
-
-            #nCampate =  self.nCampate 
-            #total_lenght = self.beam.spans_total_lenght()
-            x, y =  list_of_xy_points
-            cum_lenghts = self.beam.spans_cum_lenght()
-
-            # y_limits for ax.vlines:
-            #y_min = 1.1 * np.min(y)
-            #y_max = 1.1 * np.max(y) 
-            plt.style.use('seaborn-poster')
-
-            fig, ax = plt.subplots(1,1, figsize = (10, 5))
-            #ax.plot(x,y)
-            ax.fill_between(x, y , linewidth=0, color='r')
-            ax.invert_yaxis()
-            ax.set_xlim(cum_lenghts[0], cum_lenghts[-1])
-            ax.set_ylim(max(y), min(y) ) # invertiti perché l'asse è invertito
-            ax.grid("True")
-            ax.axhline(0, color='grey', linewidth=2)
-            #ax.vlines(cum_lenghts, ymin=y_min, ymax=y_max,linestyles='dotted')
-            #ax.set_xticklabels(cum_lenghts) # per il nome campata magari
-            ax.set_xticks(cum_lenghts) #TODO aggiungere xthick nel massimo in mezzeria
-            #ax.set_yticks(np.arange(-300, 250, step=50)) #TODO
-            ax.set_xlabel(r"L")
-            ax.set_ylabel(r"M") #TODO aggiungere l'if se si usa per il taglio
-            
-            plt.show()
-            return fig #,ax
