@@ -10,8 +10,7 @@ import sympy as sp
 import matplotlib.pyplot as plt
 import pandas as pd
 
-
-
+plt.style.use('seaborn-whitegrid')
 # -- GENERAL PAGE SETUP --
 st.set_page_config(
      page_title = "Continuous beam solver",

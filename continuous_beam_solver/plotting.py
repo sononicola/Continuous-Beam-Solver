@@ -1,9 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-plt.style.use('science')
-plt.rcParams['text.usetex'] = False
-
 class Plot:
     def my_plot_style(list_of_y_points:list[list] or list, title, x_thicks:list, y_label:str):
         """This is just a style definitions for plot methods. 
@@ -19,10 +16,10 @@ class Plot:
         #ax.vlines(cum_lenghts, ymin=y_min, ymax=y_max,linestyles='dotted')
         #ax.set_xticklabels(cum_lenghts) # per il nome campata magari
         ax.set_xticks(np.round(x_thicks,2)) #TODO aggiungere xthick nel massimo in mezzeria
-        #ax.set_yticks(np.arange(-300, 250, step=50)) #TODO
+        #ax.set_yticks(np.arange(-300, 250, step=50)) #TODO 
         ax.tick_params(axis='both', labelsize=12)
         ax.set_title(title, fontsize=18)
-        ax.set_xlabel("Loaaaaadddsoo", fontsize=14)
+        ax.set_xlabel("L", fontsize=14)
         ax.set_ylabel(y_label, fontsize=14) #TODO aggiungere l'if se si usa per il taglio
         return  fig, ax
 
