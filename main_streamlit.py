@@ -82,7 +82,7 @@ with c3:
         st.number_input(
             label = f"Q_max {i}",
             value = 1.,
-            min_value = 1.,
+            #min_value = 1.,
             step = 1.,
             format = "%.3f",
             key = f"q_max {i}"
@@ -95,7 +95,7 @@ with c4:
         st.number_input(
             label = f"Q_min {i}",
             value = 0.,
-            min_value = 0.,
+            #min_value = 0.,
             step = 1.,
             format = "%.3f",
             key = f"q_min {i}"
