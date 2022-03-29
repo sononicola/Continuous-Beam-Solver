@@ -38,8 +38,8 @@ class Table:
         
         body_table = [
                         s, 
-                        [cords_y_neg[index] for index in indexes_maxs]
-                        [cords_y_pos[index] for index in indexes_maxs],
+                        [cords_y_neg[index] for index in indexes_maxs],
+                        [cords_y_pos[index] for index in indexes_maxs]
                     ]
         return body_table
 
