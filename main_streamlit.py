@@ -163,7 +163,7 @@ def run(beam: Beam):
     M_df_results = Table.create_dataframe(
         header=Table.make_header(len(beam.spans)),
         rows = Table.make_body(M_cords_x, M_cords_y_pos, M_cords_y_neg,beam.spans_cum_lenght()),
-        index = ["s", "M_pos","M_neg"]
+        index = ["s", "M_neg","M_pos"]
     )  
     st.table(M_df_results)
     st.warning("If Bending Moment values aren't 0.0 when the support is Simple, it's a problem due to approximation!")

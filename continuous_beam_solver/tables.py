@@ -35,10 +35,11 @@ class Table:
         
         indexes_maxs[0] = 1 # for some reason cords_y_pos[0] and cords_y_neg[0] aren't correct, 
                             # so cords_y_pos[1] solves the problems
+        
         body_table = [
                         s, 
-                        [cords_y_pos[index] for index in indexes_maxs],
                         [cords_y_neg[index] for index in indexes_maxs]
+                        [cords_y_pos[index] for index in indexes_maxs],
                     ]
         return body_table
 
