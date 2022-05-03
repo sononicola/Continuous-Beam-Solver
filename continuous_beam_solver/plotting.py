@@ -6,7 +6,7 @@ class Plot:
         """This is just a style definitions for plot methods. 
         list_of_y_points can be an array of y points or a list of arrays of y points (like in the inviluppo methods)
         """
-        fig, ax = plt.subplots(1,1, figsize = (16, 10), tight_layout=True)
+        fig, ax = plt.subplots(1,1, figsize = (12, 6), tight_layout=True)
        
         ax.invert_yaxis()
         ax.set_xlim(x_thicks[0], x_thicks[-1])
@@ -39,6 +39,16 @@ class Plot:
         
         for y_plot in list_of_y_points:
             ax.fill_between(s_func, y_plot , linewidth=0, color=color)
+        
+        return  fig, ax
+
+    def plot_list_of_y_points_transposed(s_tras_pos:list, s_tras_neg:list, list_of_y_points:list[list], title:str, x_thicks:list, y_label:str, color:str):
+        """Plot the inviluppo() using my_plot_style"""
+        #list_of_y_point = self.inviluppo()
+        fig, ax = Plot.my_plot_style(list_of_y_points, title, x_thicks, y_label)
+        
+        ax.fill_between(s_tras_pos, list_of_y_points[0], linewidth=0, color=color, interpolate=True)
+        ax.fill_between(s_tras_neg, list_of_y_points[1] , linewidth=0, color=color)
         
         return  fig, ax
 

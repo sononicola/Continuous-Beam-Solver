@@ -5,6 +5,33 @@ from continuous_beam_solver.global_variables import *
 import numpy as np
 import sympy as sp
 
+
+def transpose_x(x:list, list_of_points:list, delta:float) -> list:
+    """
+    list_of_points is a list with cum lenght and x where is the max values. Use Table.makebody[0] to calculate it
+    """
+    s_tras_neg = x.copy()
+    s_tras_pos = x.copy()
+    
+    for i in range(2,len(list_of_points),2):
+        for j in range(len(s_tras_neg)):
+            if s_tras_neg[j] > list_of_points[i-2] and s_tras_neg[j] < list_of_points[i]:
+                if s_tras_neg[j] < list_of_points[i-1]:
+                    s_tras_neg[j] = s_tras_neg[j] + delta
+                else:
+                    s_tras_neg[j] = s_tras_neg[j] - delta
+
+    for i in range(2,len(list_of_points),2):
+        for j in range(len(s_tras_pos)):
+            if s_tras_neg[j] > list_of_points[i-2] and s_tras_pos[j] < list_of_points[i]:
+                if s_tras_pos[j] < list_of_points[i-1]:
+                    s_tras_pos[j] = s_tras_pos[j] - delta
+                else:
+                    s_tras_pos[j] = s_tras_pos[j] + delta
+            
+    return s_tras_pos, s_tras_neg
+
+
 class InternalForce:
     def __init__(self, beam:Beam, x:list[sp.Matrix], r:list[sp.Matrix]):
         """x and r are the solutions taken from Solve.generate_expanded_x_solutions() 
@@ -68,6 +95,22 @@ class InternalForce:
                     s_func = self.s_func, 
                     list_of_y_points = self.inviluppo(), 
                     title =r"Inviluppo",
+                    x_thicks = self.beam.spans_cum_lenght(), #aggiungere qui gli altri punti
+                    y_label = r"M", 
+                    color = "r" )
+        return  fig
+    
+    def plot_inviluppo_trasposed(self, list_of_points:list, delta:float): #TODO nome trasposed
+        """Plot the inviluppo() using Plot.my_plot_style"""
+        s_tras_pos, s_tras_neg = transpose_x(
+            x=self.s_func, 
+            list_of_points=list_of_points, 
+            delta=delta)
+        fig, ax = Plot.plot_list_of_y_points_transposed(
+                    s_tras_pos = s_tras_pos, 
+                    s_tras_neg = s_tras_neg,
+                    list_of_y_points = self.inviluppo(), 
+                    title =r"Inviluppo trasposto",
                     x_thicks = self.beam.spans_cum_lenght(), #aggiungere qui gli altri punti
                     y_label = r"M", 
                     color = "r" )

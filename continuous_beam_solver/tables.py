@@ -1,6 +1,6 @@
 import pandas as pd
 
-from continuous_beam_solver.maxs_mins import list_of_max_indexes, list_of_min_indexes
+from continuous_beam_solver.maxs_mins import list_of_max_indexes, list_of_min_indexes, find_local_max_xy
 from continuous_beam_solver.global_variables import *
 
 class Table:
@@ -40,6 +40,24 @@ class Table:
                         s, 
                         [cords_y_neg[index] for index in indexes_maxs],
                         [cords_y_pos[index] for index in indexes_maxs]
+                    ]
+        return body_table
+
+    def make_body_shear(cords_x, cords_y_pos, cords_y_neg, list_of_points) -> list[list]:
+        tol = ARANGE_STEP
+        indexes_maxs = [find_local_max_xy(cords_x, cords_y_pos, list_of_points[i] , list_of_points[i])[0] for i in range(len(list_of_points)-1)]
+        #indexes_maxs = list_of_max_indexes(x = cords_x, y = cords_y_pos, list_of_points = list_of_points)
+       # indexes_mins = list_of_min_indexes(x = cords_x, y = cords_y_neg, list_of_points = list_of_points)
+        s = [cords_x[index] for index in indexes_maxs]
+        s[-1] = s[-1] + 2*tol # due to np.arange aproximation, last term was not equal to total_lenght
+        
+        indexes_maxs[0] = 1 # for some reason cords_y_pos[0] and cords_y_neg[0] aren't correct, 
+                            # so cords_y_pos[1] solves the problems
+        
+        body_table = [
+                        s, 
+                        [cords_y_pos[index] for index in indexes_maxs],
+                        [cords_y_neg[index] for index in indexes_maxs]
                     ]
         return body_table
 
