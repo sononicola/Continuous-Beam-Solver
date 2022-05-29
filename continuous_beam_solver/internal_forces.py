@@ -12,7 +12,7 @@ def transpose_x(x:list, list_of_points:list, delta:float) -> list:
     """
     s_tras_neg = x.copy()
     s_tras_pos = x.copy()
-    
+
     for i in range(2,len(list_of_points),2):
         for j in range(len(s_tras_neg)):
             if s_tras_neg[j] > list_of_points[i-2] and s_tras_neg[j] < list_of_points[i]:
@@ -97,8 +97,8 @@ class InternalForce:
                     title =r"Inviluppo",
                     x_thicks = self.beam.spans_cum_lenght(), #aggiungere qui gli altri punti
                     y_label = r"M", 
-                    color = "r" )
-        return  fig
+                    color = PLOTTING_COLOR )
+        return  fig, ax
     
     def plot_inviluppo_trasposed(self, list_of_points:list, delta:float): #TODO nome trasposed
         """Plot the inviluppo() using Plot.my_plot_style"""
@@ -113,8 +113,8 @@ class InternalForce:
                     title =r"Inviluppo trasposto",
                     x_thicks = self.beam.spans_cum_lenght(), #aggiungere qui gli altri punti
                     y_label = r"M", 
-                    color = "r" )
-        return  fig
+                    color = PLOTTING_COLOR )
+        return  fig, ax
 
     def plot_beam_Q_1(self):
         """Plot the internal_force_beam_Q_1() using Plot.my_plot_style"""
@@ -124,8 +124,8 @@ class InternalForce:
                     title = "Carico unitario",
                     x_thicks = self.beam.spans_cum_lenght(), 
                     y_label = r"M", 
-                    color = "r" )
-        return  fig
+                    color = PLOTTING_COLOR )
+        return  fig, ax
     
     def plot_span_Q_1(self, span_Q:int):
         """Plot the calculate_internal_force_span_Q_1(span_Q) using Plot.my_plot_style. The first span is 0"""
@@ -135,8 +135,8 @@ class InternalForce:
                     title = f"Q = 1 only in span number {span_Q + 1}",
                     x_thicks = self.beam.spans_cum_lenght(), 
                     y_label = r"M", 
-                    color = "r" )
-        return  fig
+                    color = PLOTTING_COLOR )
+        return  fig, ax
 
 class BendingMoment(InternalForce):
     def __init__(self,beam:Beam, x:list[sp.Matrix], r:list[sp.Matrix]):
@@ -224,6 +224,6 @@ class Shear(InternalForce):
                     title =r"Inviluppo",
                     x_thicks = self.beam.spans_cum_lenght(), #aggiungere qui gli altri punti
                     y_label = r"V", 
-                    color = "r" )
+                    color = PLOTTING_COLOR )
         ax.invert_yaxis()
-        return  fig
+        return  fig, ax

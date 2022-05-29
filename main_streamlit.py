@@ -151,13 +151,13 @@ def run(beam: Beam):
 
 # PLOTTING 
     # BENDING MOMENT
-    st.pyplot(M.plot_inviluppo())
+    st.pyplot(M.plot_inviluppo()[0])
 
     with st.expander("👉 Click to see plots where Q = 1 is applied in each span"):
         st.write("Bending Moment")
         for span in range(len(beam.spans)):
-            st.pyplot(M.plot_span_Q_1(span))
-        st.pyplot(M.plot_beam_Q_1())
+            st.pyplot(M.plot_span_Q_1(span)[0])
+        st.pyplot(M.plot_beam_Q_1()[0])
 
     # table results for bending moment
     M_df_results = Table.create_dataframe(
@@ -172,13 +172,13 @@ def run(beam: Beam):
     st.download_button("💾 Save results as a LaTeX table", data=df_results_M_latex, mime="text/latex",file_name="results_M_table.tex")
 
     # SHEAR
-    st.pyplot(V.plot_inviluppo())
+    st.pyplot(V.plot_inviluppo()[0])
 
     with st.expander("👉 Click to see plots where Q = 1 is applied in each span"):
         st.write("Bending Voment")
         for span in range(len(beam.spans)):
-            st.pyplot(V.plot_span_Q_1(span))
-        st.pyplot(V.plot_beam_Q_1())
+            st.pyplot(V.plot_span_Q_1(span)[0])
+        st.pyplot(V.plot_beam_Q_1()[0])
 
     # table results for bending moment
     V_df_results = Table.create_dataframe(

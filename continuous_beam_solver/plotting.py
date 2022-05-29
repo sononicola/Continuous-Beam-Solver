@@ -47,7 +47,7 @@ class Plot:
         #list_of_y_point = self.inviluppo()
         fig, ax = Plot.my_plot_style(list_of_y_points, title, x_thicks, y_label)
         
-        ax.fill_between(s_tras_pos, list_of_y_points[0], linewidth=0, color=color, interpolate=True)
+        ax.fill_between(s_tras_pos, list_of_y_points[0], linewidth=0, color=color)
         ax.fill_between(s_tras_neg, list_of_y_points[1] , linewidth=0, color=color)
         
         return  fig, ax

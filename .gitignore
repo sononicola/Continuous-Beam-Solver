@@ -274,3 +274,5 @@ TSWLatexianTemp*
 .ipynb_checkpoints/
 __pycache__/solver.cpython-39.pyc
 *.pyc
+export/
+ULS_trave.tex
