@@ -1,2 +1,2 @@
-ARANGE_STEP = 0.001 # 1 millimetre
+ARANGE_STEP = 0.001  # 1 millimetre
 PLOTTING_COLOR = "#C8102E"
