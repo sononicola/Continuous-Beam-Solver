@@ -92,11 +92,24 @@ class InternalForce:
 
         return m_tot_Q_values
 
-    def inviluppo(self):  # TODO nome inviluppo
+    def _single_combination(self) -> list[np.array]:
+        """
+        A differenza di self.inviluppo non crea un inviluppo ma genera le varie liste per ogni combianzione. Utile per la deformazione di singola campata
+        
+        Ritorna una lista di liste. Dentro ciascuna c'è l'array da printare
+        """
+        combinations = self.beam._combinations_values()
+
+        return [
+            self.internal_force_beam_Q_real_values(combinations[comb])
+            for comb in range(len(combinations))
+        ]
+
+    def inviluppo(self) -> tuple[np.array]:  # TODO nome inviluppo
         """For each combination substitute the real values of Q and then create the y+ and y- of the inviluppo"""
         # total_lenght = self.beam.spans_total_lenght()
 
-        combinations = self.beam.combinations()
+        combinations = self.beam._combinations_values()
         # TODO da capire se ha senso o no togliere questa parte di grafico:
         # the param 'initial=0' is used for:
         # in np.max:   if y[i] < 0 then y[i] = 0 else y[i] = y[i]
@@ -136,12 +149,31 @@ class InternalForce:
         )
         return fig, ax
 
+    def plot_single_combinations(self):
+        """plot the _single_combination()"""
+        fig, ax = Plot.plot_list_of_y_points(
+            s_func=self.s_func,
+            list_of_y_points=self._single_combination(),
+            title=r"Singole combinazioni",
+            x_thicks=self.beam.spans_cum_lenght(),  # aggiungere qui gli altri punti
+            y_label=r"M",
+            color=PLOTTING_COLOR,
+            fill=False
+        )
+        ax.legend(self.beam._combinations_names())
+
+        return fig, ax
+
     def plot_inviluppo_trasposed(
-        self, list_of_points: list, delta: float
+        self, list_of_points: list, delta: float, left_support, right_support
     ):  # TODO nome trasposed
         """Plot the inviluppo() using Plot.my_plot_style"""
         s_tras_pos, s_tras_neg = transpose_x(
-            x=self.s_func, list_of_points=list_of_points, delta=delta
+            x=self.s_func,
+            list_of_points=list_of_points,
+            delta=delta,
+            left_support=left_support,
+            right_support=right_support,
         )
         fig, ax = Plot.plot_list_of_y_points_transposed(
             s_tras_pos=s_tras_pos,

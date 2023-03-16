@@ -55,14 +55,19 @@ class Plot:
         x_thicks: list,
         y_label: str,
         color: str,
+        fill: bool = True
     ):
         """Plot the inviluppo() using my_plot_style"""
         # list_of_y_point = self.inviluppo()
         fig, ax = Plot.my_plot_style(list_of_y_points, title, x_thicks, y_label)
 
+        k = 1
         for y_plot in list_of_y_points:
-            ax.fill_between(s_func, y_plot, linewidth=0, color=color)
-
+            if fill:
+                ax.fill_between(s_func, y_plot, linewidth=0, color=color)
+            else:
+                ax.plot(s_func, y_plot, label=f"{k}")
+                k = k + 1
         return fig, ax
 
     def plot_list_of_y_points_transposed(
