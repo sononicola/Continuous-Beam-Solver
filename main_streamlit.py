@@ -40,59 +40,61 @@ with a3:
         label="Right support", options=supports_list, index=1, key="right_support"
     )
 
-# Every column creates a list
-c1, c2, c3, c4 = st.columns(4)
-with c1:
-    # st.write("Lenghts")
-    lenghts = [
-        st.number_input(
-            label=f"Lenght {i}",
-            min_value=1.0,
-            step=1.0,
-            format="%.3f",
-            key=f"lenght {i}",
-        )
-        for i in range(1, nSpan + 1)
-    ]
-with c2:
-    # st.write("EJs")
-    ejs = [
-        st.number_input(
-            label=f"EJ {i}",
-            value=983623.0,
-            min_value=1.0,
-            step=1.0,
-            format="%.3f",
-            key=f"ej {i}",
-        )
-        for i in range(1, nSpan + 1)
-    ]
-with c3:
-    # st.write("EJs")
-    q_max = [
-        st.number_input(
-            label=f"Q_max {i}",
-            value=1.0,
-            # min_value = 1.,
-            step=1.0,
-            format="%.3f",
-            key=f"q_max {i}",
-        )
-        for i in range(1, nSpan + 1)
-    ]
-with c4:
-    # st.write("EJs")
-    q_min = [
-        st.number_input(
-            label=f"Q_min {i}",
-            value=0.0,
-            # min_value = 0.,
-            step=1.0,
-            format="%.3f",
-            key=f"q_min {i}",
-        )
-        for i in range(1, nSpan + 1)
-    ]
+with st.form("input"): 
+    # Every column creates a list
+    c1, c2, c3, c4 = st.columns(4)
+    with c1:
+        # st.write("Lenghts")
+        lenghts = [
+            st.number_input(
+                label=f"Lenght {i}",
+                min_value=1.0,
+                step=1.0,
+                format="%.3f",
+                key=f"lenght {i}",
+            )
+            for i in range(1, nSpan + 1)
+        ]
+    with c2:
+        # st.write("EJs")
+        ejs = [
+            st.number_input(
+                label=f"EJ {i}",
+                value=983623.0,
+                min_value=1.0,
+                step=1.0,
+                format="%.3f",
+                key=f"ej {i}",
+            )
+            for i in range(1, nSpan + 1)
+        ]
+    with c3:
+        # st.write("EJs")
+        q_max = [
+            st.number_input(
+                label=f"Q_max {i}",
+                value=1.0,
+                # min_value = 1.,
+                step=1.0,
+                format="%.3f",
+                key=f"q_max {i}",
+            )
+            for i in range(1, nSpan + 1)
+        ]
+    with c4:
+        # st.write("EJs")
+        q_min = [
+            st.number_input(
+                label=f"Q_min {i}",
+                value=0.0,
+                # min_value = 0.,
+                step=1.0,
+                format="%.3f",
+                key=f"q_min {i}",
+            )
+            for i in range(1, nSpan + 1)
+        ]
+    run_button = st.form_submit_button("Run 🏗")     
 # -- INIT OBJECTS --
 
 # List of Span objects created starting from each list taken above:
@@ -112,8 +114,6 @@ df_inputs = pd.DataFrame(
 st.table(df_inputs)
 
 # -- RUNNING PROGRAM --
-run_button = st.button("Run 🏗")
-
 
 def run(beam: Beam):
     sol = Solver(beam)
