@@ -162,41 +162,4 @@ class Beam:
     def combinations(self) -> dict[str, list[float]]:
         "Return a dict with combinations' names and the respective loads values applied to each span"
         return dict(zip(self._combinations_names(), self._combinations_values()))
-    # --- REAL SOLVING METHODS: ---
-    # Using sympy:  symbolic -> reduced with BC -> subsituted with numeric values ->  solved the system ->  expanded to initial lenghts row, columns
 
-    def symbolic_matrix_lenghts():
-        pass
-
-    def symbolic_matrix_Q():
-        pass
-
-    def symbolic_matrix_P():
-        pass
-
-    def symbolic_matrix_EJ():
-        pass
-
-    # --- PRINTING/PLOTTING AND STORING VALUES ---
-    def plot_M_unitario():  # nomi migliori per tuti
-        pass
-
-    def plot_V_unitario():
-        pass
-
-    def plot_M_totale():
-        pass
-
-    def plot_V_totale():
-        pass
-
-    def tabella():
-        pass
-
-    def latex_passaggi_intermedi():
-        pass
-
-    # ---
-    # Linee orizzontali al momento aggiungendo un parametro a Beam con il valore di M
-
-    # Disegno tikz
