@@ -1,14 +1,18 @@
 import numpy as np
 import sympy as sp
 
-from continuous_beam_solver.span_beam import Beam
 from continuous_beam_solver.global_variables import *
+
+# TODO se si fa in modo che Solver non dipenda piú da trave ma solo dalle variabili in essa, allora non è piu accoppiata (left_support, right, ncampate, ecc)
 
 
 class Solver:
-    def __init__(self, beam: Beam):
-        self.beam = beam
-        self.nCampate = len(beam.spans)
+    def __init__(self, nCampate:int, left_support:str, right_support:str, spans_lenght:list[float], spans_ej:list[float]):
+        self.nCampate = nCampate
+        self.left_support = left_support
+        self.right_support = right_support
+        self.spans_lenght = spans_lenght
+        self.spans_ej = spans_ej
 
     def generate_simbolic_variables(
         self,
@@ -97,8 +101,8 @@ class Solver:
 
     def generate_reduced_Flex_matrix_and_P_vector(self):
         nCampate = self.nCampate
-        left_support = self.beam.left_support
-        right_support = self.beam.right_support
+        left_support = self.left_support
+        right_support = self.right_support
         flex_gen = self.generate_Flex_matrix()
         P_gen = self.generate_P_vector_Q()
 
@@ -125,8 +129,8 @@ class Solver:
         L, P, Q, EJ = self.generate_simbolic_variables()
         flex_rid, P_rid = self.generate_reduced_Flex_matrix_and_P_vector()
         # List of numeric values taken from Beam
-        lenghts = self.beam.spans_lenght()
-        ej = self.beam.spans_ej()
+        lenghts = self.spans_lenght
+        ej = self.spans_ej
 
         # To solve the system for a generic Q=1 we have to subtistute values and then solve the systen for every span.
         # With Q values we have to subsistute them one at time and the must be other zero.
@@ -159,8 +163,8 @@ class Solver:
         In base of boundary conditions return to initial lenghts the x_solution_vectors calculated in generate_reduced_x_solutions(self)
         """
         nCampate = self.nCampate
-        left_support = self.beam.left_support
-        right_support = self.beam.right_support
+        left_support = self.left_support
+        right_support = self.right_support
         list_of_reduced_x_solution_vectors = self.generate_reduced_x_solutions()
 
         # init with an identic list of the reduced one, and then add or not the zeros
@@ -201,7 +205,7 @@ class Solver:
         """
         nCampate = self.nCampate
         # x = self.generate_expanded_x_solutions()
-        lenghts = self.beam.spans_lenght()
+        lenghts = self.spans_lenght
 
         list_of_R = []  # ---- oppure mettere - X + L/2:
         for n_span in range(nCampate):
@@ -214,4 +218,7 @@ class Solver:
             mat2 = sp.Matrix(lenghts[n_span] / 2 * np.identity(nCampate)[n_span])
             list_of_R.append(mat1 + mat2)
         return list_of_R
+    
+    
+
 
