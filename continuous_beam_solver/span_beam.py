@@ -1,6 +1,5 @@
 import numpy as np
 
-
 def combinations_generic(
     q_max_list: list, q_min_list: list, nCampate: int
 ) -> list[list]:
@@ -131,6 +130,7 @@ class Beam:
         return [span.q_min for span in self.spans]
 
     def _combinations_values(self) -> list[list[float]]:
+        "Return the loads applied to each span, for each combination"
         return combinations_generic(
             q_max_list=self.spans_q_max(),
             q_min_list=self.spans_q_min(),
@@ -138,17 +138,29 @@ class Beam:
         )
 
     def _combinations_names(self) -> list[str]:
-        combs: list[list[str]] =  combinations_generic(
+        """
+        Return the combinations' names that are used.
+        Example:
+        [
+        ["SSSS"],
+        ["SFSF"],
+        ["SSFS"],
+        ["FSSF"],
+        ["SFSS"]
+        ]
+        """
+        combs: list[list[str]] = combinations_generic(
             q_max_list=["S" for span in range(len(self.spans))],
             q_min_list=["F" for span in range(len(self.spans))],
             nCampate=len(self.spans),
         )
-        combination_name:list[str] = []
+        combination_name: list[str] = []
         for comb in combs:
             combination_name.append("".join(comb))
         return combination_name
-    
-    def combinations(self) -> dict[str,list[float]]:
+
+    def combinations(self) -> dict[str, list[float]]:
+        "Return a dict with combinations' names and the respective loads values applied to each span"
         return dict(zip(self._combinations_names(), self._combinations_values()))
     # --- REAL SOLVING METHODS: ---
     # Using sympy:  symbolic -> reduced with BC -> subsituted with numeric values ->  solved the system ->  expanded to initial lenghts row, columns
