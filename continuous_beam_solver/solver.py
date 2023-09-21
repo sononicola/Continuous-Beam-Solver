@@ -7,7 +7,14 @@ from continuous_beam_solver.global_variables import *
 
 
 class Solver:
-    def __init__(self, nCampate:int, left_support:str, right_support:str, spans_lenght:list[float], spans_ej:list[float]):
+    def __init__(
+        self,
+        nCampate: int,
+        left_support: str,
+        right_support: str,
+        spans_lenght: list[float],
+        spans_ej: list[float],
+    ):
         self.nCampate = nCampate
         self.left_support = left_support
         self.right_support = right_support
@@ -218,7 +225,3 @@ class Solver:
             mat2 = sp.Matrix(lenghts[n_span] / 2 * np.identity(nCampate)[n_span])
             list_of_R.append(mat1 + mat2)
         return list_of_R
-    
-    
-
-

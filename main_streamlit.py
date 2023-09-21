@@ -106,17 +106,18 @@ beam = Beam(spans=spans, left_support=left_support, right_support=right_support)
 # beam = Beam([], left_support=left_support, right_support=right_support)
 # beam.add_list_of_spans(spans)
 
-df_inputs = pd.DataFrame(
+# -- RUNNING PROGRAM --
+
+def run(beam: Beam):
+    st.subheader("Inputs:")
+    df_inputs = pd.DataFrame(
     columns=[f"C{i}" for i in range(1, nSpan + 1)],
     data=[beam.spans_lenght(), beam.spans_ej(), beam.spans_q_max(), beam.spans_q_min()],
     index=["Lenghts", "EJs", "Q_Maxs", "Q_Mins"],
 )
-st.table(df_inputs)
-
-# -- RUNNING PROGRAM --
-
-def run(beam: Beam):
-    sol = Solver(beam)
+    st.table(df_inputs)
+    st.subheader("Solutions:")
+    sol = beam._make_Solver()
     x = sol.generate_expanded_x_solutions()
     r = sol.generate_R_solutions(x)
     st.latex(r"\textup{Flex}_{generic} = " + sp.latex(sol.generate_Flex_matrix()))
@@ -130,8 +131,8 @@ def run(beam: Beam):
     st.latex(r"\hookrightarrow \textup{R} = " + sp.latex(r))
 
     # -- CALCULATING BENDING MOMENT --
-    M = BendingMoment(beam, x, r)
-    V = Shear(beam, x, r)
+    M = BendingMoment(beam)
+    V = Shear(beam)
 
     # storing x,y coordinates of inviluppo plot
     M_cords_x = M.s_func
@@ -142,6 +143,7 @@ def run(beam: Beam):
 
     # PLOTTING
     # BENDING MOMENT
+    st.header("Bending Moment")
     st.pyplot(M.plot_inviluppo()[0])
 
     with st.expander("👉 Click to see plots where Q = 1 is applied in each span"):
@@ -174,6 +176,7 @@ def run(beam: Beam):
     )
 
     # SHEAR
+    st.header("Shear")
     st.pyplot(V.plot_inviluppo()[0])
 
     with st.expander("👉 Click to see plots where Q = 1 is applied in each span"):

@@ -6,9 +6,11 @@ import numpy as np
 import sympy as sp
 
 
-def transpose_x(x: list, list_of_points: list, delta: float) -> list:
+def transpose_x(
+    x: list, list_of_points: list, delta: float, left_support, right_support
+) -> tuple[list]:
     """
-    list_of_points is a list with cum lenght and x where is the max values. Use Table.makebody[0] to calculate it
+    list_of_points is a list with cum lenght and the x where is the max values are. Use Table.makebody[0] to calculate it
     """
     s_tras_neg = x.copy()
     s_tras_pos = x.copy()
@@ -19,7 +21,21 @@ def transpose_x(x: list, list_of_points: list, delta: float) -> list:
                 s_tras_neg[j] > list_of_points[i - 2]
                 and s_tras_neg[j] < list_of_points[i]
             ):
-                if s_tras_neg[j] < list_of_points[i - 1]:
+                if i == 2 and left_support == "Simple":
+                    s_tras_neg[j] = s_tras_neg[j] - delta
+                elif i == 2 and left_support == "Fixed":
+                    s_tras_neg[j] = s_tras_neg[j] + delta
+                elif i == len(list_of_points) - 2:
+                    s_tras_neg[j] = s_tras_neg[j] + delta
+                elif i == len(list_of_points) - 1 and right_support == "Simple":
+                    pass  # s_tras_neg[j] = s_tras_neg[j] + delta
+                elif (
+                    i == len(list_of_points) - 1
+                    and right_support == "Fixed"
+                    and s_tras_neg[j] > list_of_points[i - 1]
+                ):
+                    s_tras_neg[j] = s_tras_neg[j] - delta
+                elif s_tras_neg[j] < list_of_points[i - 1]:
                     s_tras_neg[j] = s_tras_neg[j] + delta
                 else:
                     s_tras_neg[j] = s_tras_neg[j] - delta
@@ -27,7 +43,7 @@ def transpose_x(x: list, list_of_points: list, delta: float) -> list:
     for i in range(2, len(list_of_points), 2):
         for j in range(len(s_tras_pos)):
             if (
-                s_tras_neg[j] > list_of_points[i - 2]
+                s_tras_pos[j] > list_of_points[i - 2]
                 and s_tras_pos[j] < list_of_points[i]
             ):
                 if s_tras_pos[j] < list_of_points[i - 1]:
@@ -39,14 +55,14 @@ def transpose_x(x: list, list_of_points: list, delta: float) -> list:
 
 
 class InternalForce:
-    def __init__(self, beam: Beam, x: list[sp.Matrix], r: list[sp.Matrix]):
-        """x and r are the solutions taken from Solve.generate_expanded_x_solutions() 
+    def __init__(self, beam: Beam):
+        """x and r are the solutions taken from Solve.generate_expanded_x_solutions()
         and Solve.generate_R_solutions(x)"""
 
         self.beam = beam
         self.nCampate = len(beam.spans)
-        self.x = x
-        self.r = r
+        self.x = beam._calc_x_r_solutions()[0]
+        self.r = beam._calc_x_r_solutions()[1]
         self.s_func = np.arange(
             0, beam.spans_total_lenght(), ARANGE_STEP
         )  # points on X axe
@@ -56,7 +72,7 @@ class InternalForce:
         pass
 
     def internal_force_beam_Q_1(self) -> list:  # TODO  _1 _func + dividere
-        """"
+        """ "
         Return Y values of bending moment or shear with unitary Q load for the entire beam. It takes the values from bending_moment_span_Q
         """
         nCampate = self.nCampate
@@ -95,7 +111,7 @@ class InternalForce:
     def _single_combination(self) -> list[np.array]:
         """
         A differenza di self.inviluppo non crea un inviluppo ma genera le varie liste per ogni combianzione. Utile per la deformazione di singola campata
-        
+
         Ritorna una lista di liste. Dentro ciascuna c'è l'array da printare
         """
         combinations = self.beam._combinations_values()
@@ -158,7 +174,7 @@ class InternalForce:
             x_thicks=self.beam.spans_cum_lenght(),  # aggiungere qui gli altri punti
             y_label=r"M",
             color=PLOTTING_COLOR,
-            fill=False
+            fill=False,
         )
         ax.legend(self.beam._combinations_names())
 
@@ -212,14 +228,14 @@ class InternalForce:
 
 
 class BendingMoment(InternalForce):
-    def __init__(self, beam: Beam, x: list[sp.Matrix], r: list[sp.Matrix]):
-        super().__init__(beam, x, r)
+    def __init__(self, beam: Beam):
+        super().__init__(beam)
 
     def calculate_internal_force_span_Q_1(
         self, span_Q: int
     ) -> sp.lambdify:  # TODO _1 _func
         """
-        Compute the bending moment lamdified function for a "span_Q", 
+        Compute the bending moment lamdified function for a "span_Q",
         which is the span where the distribuited load Q is applied and the others Q is zero
         """
         # TODO togliere i commentati
@@ -265,12 +281,12 @@ class BendingMoment(InternalForce):
 
 
 class Shear(InternalForce):
-    def __init__(self, beam: Beam, x: list[sp.Matrix], r: list[sp.Matrix]):
-        super().__init__(beam, x, r)
+    def __init__(self, beam: Beam):
+        super().__init__(beam)
 
     def calculate_internal_force_span_Q_1(self, span_Q: int) -> sp.lambdify:
         """
-        Compute the shear lamdified function for a "span_Q", 
+        Compute the shear lamdified function for a "span_Q",
         which is the span where the distribuited load Q is applied and the others Q is zero
         """
         # TODO togliere i commentati
@@ -313,4 +329,3 @@ class Shear(InternalForce):
         )
         ax.invert_yaxis()
         return fig, ax
-

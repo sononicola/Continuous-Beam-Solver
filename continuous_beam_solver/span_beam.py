@@ -1,4 +1,9 @@
 import numpy as np
+import sympy as sp
+
+# from continuous_beam_solver.internal_forces import BendingMoment
+from continuous_beam_solver.solver import Solver
+
 
 def combinations_generic(
     q_max_list: list, q_min_list: list, nCampate: int
@@ -163,3 +168,19 @@ class Beam:
         "Return a dict with combinations' names and the respective loads values applied to each span"
         return dict(zip(self._combinations_names(), self._combinations_values()))
 
+    def _make_Solver(self) -> Solver:
+        return Solver(
+            nCampate=len(self.spans),
+            left_support=self.left_support,
+            right_support=self.right_support,
+            spans_lenght=self.spans_lenght(),
+            spans_ej=self.spans_ej(),
+        )
+
+    def _calc_x_r_solutions(self) -> tuple[list[sp.Matrix], list[sp.Matrix]]:
+        "Return x and R solutions after solving the system"
+        sol = self._make_Solver()
+        x = sol.generate_expanded_x_solutions()
+        r = sol.generate_R_solutions(x)
+
+        return x, r
