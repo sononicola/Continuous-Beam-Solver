@@ -18,3 +18,4 @@ setuptools-scm==8.0.1 ; python_version >= "3.11" and python_version < "4.0"
 setuptools==68.2.2 ; python_version >= "3.11" and python_version < "4.0"
 six==1.16.0 ; python_version >= "3.11" and python_version < "4.0"
 sympy==1.12 ; python_version >= "3.11" and python_version < "4.0"
+streamlit == 1.26.0
