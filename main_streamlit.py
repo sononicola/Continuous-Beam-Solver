@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 
+
 # -- GENERAL PAGE SETUP --
 st.set_page_config(
     page_title="Continuous beam solver",
@@ -94,7 +95,7 @@ with st.form("input"):
             )
             for i in range(1, nSpan + 1)
         ]
-    run_button = st.form_submit_button("Run 🏗")     
+    run_button = st.form_submit_button("Run")     
 # -- INIT OBJECTS --
 
 # List of Span objects created starting from each list taken above:
