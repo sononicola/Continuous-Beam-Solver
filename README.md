@@ -1,7 +1,7 @@
 [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://continuous-beam-solver.streamlitapp.com/)
 
 ## Example 
-'''python
+```python
 from continuous_beam_solver import Beam, Span
 from continuous_beam_solver.internal_forces import BendingMoment, Shear
 import matplotlib.pyplot as plt
@@ -22,4 +22,4 @@ plt.show()
 V = Shear(beam)
 V.plot_inviluppo()
 plt.show()
-'''
+```
