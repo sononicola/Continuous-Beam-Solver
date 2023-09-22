@@ -276,3 +276,4 @@ __pycache__/solver.cpython-39.pyc
 *.pyc
 export/
 ULS_trave.tex
+main_streamlit_test.py
