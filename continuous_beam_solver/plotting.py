@@ -1,10 +1,11 @@
+from typing import Optional
 import numpy as np
 import matplotlib.pyplot as plt
 
 
 class Plot:
     def my_plot_style(
-        list_of_y_points: list[list] or list, title, x_thicks: list, y_label: str
+        list_of_y_points: list[list] or list, title, x_thicks: list, y_label: str, unit_measure_x: Optional[str] = "m"
     ):
         """This is just a style definitions for plot methods. 
         list_of_y_points can be an array of y points or a list of arrays of y points (like in the inviluppo methods)
@@ -26,7 +27,7 @@ class Plot:
         # ax.set_yticks(np.arange(-300, 250, step=50)) #TODO
         ax.tick_params(axis="both", labelsize=12)
         ax.set_title(title, fontsize=18)
-        ax.set_xlabel("L", fontsize=14)
+        ax.set_xlabel(f"L [{unit_measure_x}]", fontsize=14)
         ax.set_ylabel(
             y_label, fontsize=14
         )  # TODO aggiungere l'if se si usa per il taglio

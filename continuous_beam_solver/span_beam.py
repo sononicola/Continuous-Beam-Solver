@@ -3,7 +3,7 @@ import sympy as sp
 
 # from continuous_beam_solver.internal_forces import BendingMoment
 from continuous_beam_solver.solver import Solver
-
+from continuous_beam_solver.internal_forces import BendingMoment, Shear
 
 def combinations_generic(
     q_max_list: list, q_min_list: list, nCampate: int
@@ -70,10 +70,6 @@ class Span:
         self.q_max = q_max
         self.q_min = q_min
 
-    def set_lenght(self):  # boh non servirà credo
-        pass
-
-
 class Beam:
     def __init__(self, spans: list[Span], left_support: str, right_support: str):
         """
@@ -83,10 +79,11 @@ class Beam:
         self.left_support = left_support
         self.right_support = right_support
 
-    def get_spans(self):  # boh non servirà credo
-        return self.spans
+    @property
+    def n_spans(self) -> int:
+        return len(self.spans)
 
-    def add_span(self, new_span: Span):
+    def add_span(self, new_span: Span) -> None:
         """Add a single Span object to the spans list.
         Don't add a list of object like add_span([x1,x2]), but use add_list_of_spans([x1,x2]) instead!
 
@@ -96,7 +93,7 @@ class Beam:
         """
         self.spans.append(new_span)
 
-    def add_list_of_spans(self, list_of_spans: list[Span]):
+    def add_list_of_spans(self, list_of_spans: list[Span]) -> None:
         """
         Add a list of object Span to the spans list.
         To add a single Span object use add_span(x1) insted!
@@ -167,7 +164,15 @@ class Beam:
     def combinations(self) -> dict[str, list[float]]:
         "Return a dict with combinations' names and the respective loads values applied to each span"
         return dict(zip(self._combinations_names(), self._combinations_values()))
+    
+    #TODO def combinations_df(self) -> pd.DataFrame
+#     combs = trave_B_0.combinations()
+# combs_df = pd.DataFrame(combs).transpose()
+# combs_df.columns = [f"C{i}" for i in range(1, len(trave_B_0.spans) + 1)]
+# combs_df
 
+
+    # call the Solver class to solve the beam with unitary load applied
     def _make_Solver(self) -> Solver:
         return Solver(
             nCampate=len(self.spans),
@@ -184,3 +189,13 @@ class Beam:
         r = sol.generate_R_solutions(x)
 
         return x, r
+    
+    def bending_moment(self) -> BendingMoment:
+        "Generate a BendingMoment object with all elements to print and plotting things"
+        return BendingMoment(self)
+    
+    def shear(self) -> Shear:
+        "Generate a BendingMoment object with all elements to print and plotting things"
+        return Shear(self)
+
+    

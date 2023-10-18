@@ -1,4 +1,8 @@
-from continuous_beam_solver.span_beam import Beam
+
+from __future__ import annotations
+from typing import TYPE_CHECKING, Optional
+if TYPE_CHECKING:
+    from continuous_beam_solver.span_beam import Beam
 from continuous_beam_solver.plotting import Plot
 from continuous_beam_solver.global_variables import *
 
@@ -67,6 +71,8 @@ class InternalForce:
             0, beam.spans_total_lenght(), ARANGE_STEP
         )  # points on X axe
         # self.s_func = np.linspace(0, beam.spans_total_lenght(), num=1000)
+
+        self._ylabel = "M" 
 
     def calculate_internal_force_span_Q_1(self, span_Q: int):  # TODO _1 _func
         pass
@@ -153,26 +159,26 @@ class InternalForce:
 
         return inviluppo_pos, inviluppo_neg
 
-    def plot_inviluppo(self):
+    def plot_inviluppo(self, unit_measure_y: Optional[str] = "kNm"):
         """Plot the inviluppo() using Plot.my_plot_style"""
         fig, ax = Plot.plot_list_of_y_points(
             s_func=self.s_func,
             list_of_y_points=self.inviluppo(),
             title=r"Inviluppo",
             x_thicks=self.beam.spans_cum_lenght(),  # aggiungere qui gli altri punti
-            y_label=r"M",
+            y_label=f"{self._ylabel} [{unit_measure_y}]",
             color=PLOTTING_COLOR,
         )
         return fig, ax
 
-    def plot_single_combinations(self):
+    def plot_single_combinations(self, unit_measure_y: Optional[str] = "kNm"):
         """plot the _single_combination()"""
         fig, ax = Plot.plot_list_of_y_points(
             s_func=self.s_func,
             list_of_y_points=self._single_combination(),
             title=r"Singole combinazioni",
             x_thicks=self.beam.spans_cum_lenght(),  # aggiungere qui gli altri punti
-            y_label=r"M",
+            y_label=f"{self._ylabel} [{unit_measure_y}]",
             color=PLOTTING_COLOR,
             fill=False,
         )
@@ -181,7 +187,7 @@ class InternalForce:
         return fig, ax
 
     def plot_inviluppo_trasposed(
-        self, list_of_points: list, delta: float, left_support, right_support
+        self, list_of_points: list, delta: float, left_support, right_support, unit_measure_y: Optional[str] = "kNm"
     ):  # TODO nome trasposed
         """Plot the inviluppo() using Plot.my_plot_style"""
         s_tras_pos, s_tras_neg = transpose_x(
@@ -197,31 +203,31 @@ class InternalForce:
             list_of_y_points=self.inviluppo(),
             title=r"Inviluppo trasposto",
             x_thicks=self.beam.spans_cum_lenght(),  # aggiungere qui gli altri punti
-            y_label=r"M",
+            y_label=f"{self._ylabel} [{unit_measure_y}]",
             color=PLOTTING_COLOR,
         )
         return fig, ax
 
-    def plot_beam_Q_1(self):
+    def plot_beam_Q_1(self, unit_measure_y: Optional[str] = "kNm"):
         """Plot the internal_force_beam_Q_1() using Plot.my_plot_style"""
         fig, ax = Plot.plot_y_points(
             s_func=self.s_func,
             y_points=self.internal_force_beam_Q_1(),
             title="Carico unitario",
             x_thicks=self.beam.spans_cum_lenght(),
-            y_label=r"M",
+            y_label=f"{self._ylabel} [{unit_measure_y}]",
             color=PLOTTING_COLOR,
         )
         return fig, ax
 
-    def plot_span_Q_1(self, span_Q: int):
+    def plot_span_Q_1(self, span_Q: int, unit_measure_y: Optional[str] = "kNm"):
         """Plot the calculate_internal_force_span_Q_1(span_Q) using Plot.my_plot_style. The first span is 0"""
         fig, ax = Plot.plot_y_points(
             s_func=self.s_func,
             y_points=self.calculate_internal_force_span_Q_1(span_Q)(self.s_func),
             title=f"Q = 1 only in span number {span_Q + 1}",
             x_thicks=self.beam.spans_cum_lenght(),
-            y_label=r"M",
+            y_label=f"{self._ylabel} [{unit_measure_y}]",
             color=PLOTTING_COLOR,
         )
         return fig, ax
@@ -283,6 +289,7 @@ class BendingMoment(InternalForce):
 class Shear(InternalForce):
     def __init__(self, beam: Beam):
         super().__init__(beam)
+        self._ylabel = "V"
 
     def calculate_internal_force_span_Q_1(self, span_Q: int) -> sp.lambdify:
         """
@@ -317,14 +324,14 @@ class Shear(InternalForce):
 
         return v_i_lambdify  # TODO m_span_Q_1
 
-    def plot_inviluppo(self):
+    def plot_inviluppo(self, unit_measure_y: Optional[str] = "kN"):
         """Plot the inviluppo() using Plot.my_plot_style"""
         fig, ax = Plot.plot_list_of_y_points(
             s_func=self.s_func,
             list_of_y_points=self.inviluppo(),
             title=r"Inviluppo",
             x_thicks=self.beam.spans_cum_lenght(),  # aggiungere qui gli altri punti
-            y_label=r"V",
+            y_label=f"{self._ylabel} [{unit_measure_y}]",
             color=PLOTTING_COLOR,
         )
         ax.invert_yaxis()
