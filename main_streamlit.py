@@ -135,13 +135,6 @@ def run(beam: Beam):
     M = BendingMoment(beam)
     V = Shear(beam)
 
-    # storing x,y coordinates of inviluppo plot
-    M_cords_x = M.s_func
-    M_cords_y_pos, M_cords_y_neg = M.inviluppo()
-
-    V_cords_x = V.s_func
-    V_cords_y_pos, V_cords_y_neg = V.inviluppo()
-
     # PLOTTING
     # BENDING MOMENT
     st.header("Bending Moment")
@@ -154,13 +147,7 @@ def run(beam: Beam):
         st.pyplot(M.plot_beam_Q_1()[0])
 
     # table results for bending moment
-    M_df_results = Table.create_dataframe(
-        header=Table.make_header(len(beam.spans)),
-        rows=Table.make_body(
-            M_cords_x, M_cords_y_pos, M_cords_y_neg, beam.spans_cum_lenght()
-        ),
-        index=["s", "M_neg", "M_pos"],
-    )
+    M_df_results = M.create_dataframe()
     st.table(M_df_results)
     st.warning(
         "If Bending Moment values aren't 0.0 when the support is Simple, it's a problem due to approximation!"
@@ -187,13 +174,7 @@ def run(beam: Beam):
         st.pyplot(V.plot_beam_Q_1()[0])
 
     # table results for bending moment
-    V_df_results = Table.create_dataframe(
-        header=Table.make_header(len(beam.spans)),
-        rows=Table.make_body(
-            V_cords_x, V_cords_y_pos, V_cords_y_neg, beam.spans_cum_lenght()
-        ),
-        index=["s", "V_pos", "V_neg"],
-    )
+    V_df_results = V.create_dataframe()
     st.table(V_df_results)
     st.warning("If Shear values aren't")
 

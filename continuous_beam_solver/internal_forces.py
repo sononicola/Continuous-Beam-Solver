@@ -5,9 +5,11 @@ if TYPE_CHECKING:
     from continuous_beam_solver.span_beam import Beam
 from continuous_beam_solver.plotting import Plot
 from continuous_beam_solver.global_variables import *
+from continuous_beam_solver.tables import Table
 
 import numpy as np
 import sympy as sp
+import pandas as pd
 
 
 def transpose_x(
@@ -284,7 +286,21 @@ class BendingMoment(InternalForce):
         # return np.sum(m_i,axis=0)
 
         return m_i_lambdify  # TODO m_span_Q_1
+    
+    def create_dataframe(self) -> pd.DataFrame:
+        M_cords_x = self.s_func
+        M_cords_y_pos, M_cords_y_neg = self.inviluppo()
+        M_df_results = Table.create_dataframe(
+        header=Table.make_header(self.beam.n_spans),
+        rows = Table.make_body(M_cords_x, M_cords_y_pos, M_cords_y_neg,self.beam.spans_cum_lenght()),
+        index = ["s", "M_neg","M_pos"]
+    )  
+        return M_df_results
 
+    def get_max(self) -> Tuple[float,float]:
+        "Return M pos max and M neg max"
+        M_cords_y_pos, M_cords_y_neg = self.inviluppo()
+        return np.max(M_cords_y_pos), np.min(M_cords_y_neg)
 
 class Shear(InternalForce):
     def __init__(self, beam: Beam):
@@ -336,3 +352,17 @@ class Shear(InternalForce):
         )
         ax.invert_yaxis()
         return fig, ax
+    
+    def create_dataframe(self) -> pd.DataFrame:
+        V_cords_x = self.s_func
+        V_cords_y_pos, V_cords_y_neg = self.inviluppo()
+        V_df_results = Table.create_dataframe(        
+            header = Table.make_header_shear(self.beam.n_spans),
+            rows = Table.make_body_shear(V_cords_x, V_cords_y_pos, V_cords_y_neg,self.beam.spans_cum_lenght()),
+            index = ["s", "V_pos","V_neg"])
+        return V_df_results
+    
+    def get_max(self) -> Tuple[float,float]:
+        "Return V pos max and V neg max"
+        V_cords_y_pos, V_cords_y_neg = self.inviluppo()
+        return np.max(V_cords_y_pos), np.min(V_cords_y_neg)
